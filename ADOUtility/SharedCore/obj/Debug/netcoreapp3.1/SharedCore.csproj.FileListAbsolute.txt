@@ -1,0 +1,11 @@
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\bin\Debug\netcoreapp3.1\NOTICE.TXT
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\bin\Debug\netcoreapp3.1\SharedCore.deps.json
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\bin\Debug\netcoreapp3.1\SharedCore.dll
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\bin\Debug\netcoreapp3.1\SharedCore.pdb
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.csproj.AssemblyReference.cache
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.AssemblyInfoInputs.cache
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.AssemblyInfo.cs
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.csproj.CoreCompileInputs.cache
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.dll
+C:\Users\Aksana_Murashka\source\repos\ADOUtility\SharedCore\obj\Debug\netcoreapp3.1\SharedCore.pdb

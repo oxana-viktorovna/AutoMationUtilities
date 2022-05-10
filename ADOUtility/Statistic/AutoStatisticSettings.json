@@ -1,0 +1,6 @@
+{
+  "firstTimeRun": true, //true is hadn't gathered statistic before. All initial files will be generated based on statistic resources
+  "saveFolder": "",
+  "asOfDate": "", //If blank will be taken as DateTime.Now
+  "defaultAreaPathes": []
+}

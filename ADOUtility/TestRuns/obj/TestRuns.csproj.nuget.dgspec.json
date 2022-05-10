@@ -1,0 +1,236 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\TestRuns\\TestRuns.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\ADOCore.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\ADOCore.csproj",
+        "projectName": "ADOCore",
+        "projectPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\ADOCore.csproj",
+        "packagesPath": "C:\\Users\\Aksana_Murashka\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Aksana_Murashka\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "netcoreapp6.0",
+            "projectReferences": {
+              "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\SharedCore.csproj": {
+                "projectPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\SharedCore.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "netcoreapp6.0",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[106.11.7, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\SharedCore.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\SharedCore.csproj",
+        "projectName": "SharedCore",
+        "projectPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\SharedCore.csproj",
+        "packagesPath": "C:\\Users\\Aksana_Murashka\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\SharedCore\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Aksana_Murashka\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "netcoreapp6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "netcoreapp6.0",
+          "dependencies": {
+            "DotNetCore.NPOI": {
+              "target": "Package",
+              "version": "[1.2.3, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Binder": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Json": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\TestRuns\\TestRuns.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\TestRuns\\TestRuns.csproj",
+        "projectName": "TestRuns",
+        "projectPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\TestRuns\\TestRuns.csproj",
+        "packagesPath": "C:\\Users\\Aksana_Murashka\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\TestRuns\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Aksana_Murashka\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "netcoreapp6.0",
+            "projectReferences": {
+              "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\ADOCore.csproj": {
+                "projectPath": "C:\\Users\\Aksana_Murashka\\Documents\\GitHub\\AutoMationUtilities\\ADOUtility\\ADOCore\\ADOCore.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "netcoreapp6.0",
+          "dependencies": {
+            "MSTest.TestAdapter": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "MSTest.TestFramework": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[16.5.0, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[106.11.7, )"
+            },
+            "coverlet.collector": {
+              "target": "Package",
+              "version": "[1.2.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

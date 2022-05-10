@@ -1,0 +1,8 @@
+{
+  "organization": "",
+  "project": "",
+  "Auth": {
+    "UserName": "",
+    "Password": "" //use your ado pat https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=preview-page
+  }
+}

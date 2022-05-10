@@ -1,0 +1,15 @@
+﻿{
+  "saveFolder": "C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\TestResultsAnalyse\\",
+  "currentTestRun": {
+    "runDate": "2022-04-27",
+    "title": "TestRun_Develop-Nightly-BVTAutomation_20220427.3",
+    "xmlReports": [
+      "Tracker-APITests-InvoicesV2Tests-jUnitReport",
+      "Tracker-APITests-Gateway-MattersV1Tests-junitReport",
+      "Tracker-APITests-LegalHoldTests-jUnitReport"
+    ]
+  },
+  "previousTestRun": {
+    "title": "TestRun_Develop-Nightly-BVTAutomation_20220426.1"
+  }
+}
