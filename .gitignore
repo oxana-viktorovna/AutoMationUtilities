@@ -3,3 +3,10 @@ ADOUtility/ADOCore/obj/project.nuget.cache
 *.cache
 *.v2
 *.v1
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+.vs/
+.vscode/
+packages
+/ADOUtility/TestResults/*
