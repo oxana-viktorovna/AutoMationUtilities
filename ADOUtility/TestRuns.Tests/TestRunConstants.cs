@@ -2,6 +2,6 @@
 {
     public static class TestRunConstants
     {
-        public const string DefaultComment = "Under investigation";
+        public const string DefaultComment = "Firefly Under investigation";
     }
 }

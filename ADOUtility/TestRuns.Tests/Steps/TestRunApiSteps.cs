@@ -53,6 +53,40 @@ namespace TestRuns.Steps
             return trxAttachements;
         }
 
+        public List<TestRun> GetTrxAttachements(int buildId, int excludeRunId = 0)
+        {
+            var allAtchsInfos = GetAllBuildAttchmentsInfo(buildId);
+            var atchsInfos = excludeRunId == 0
+                ? allAtchsInfos
+                : allAtchsInfos.Where(r => r.runId != excludeRunId);
+
+            var trxAttchIds = GetLastAttchsIdsByType(atchsInfos, ".trx");
+            var trxAttachements = GetTxrAttachments(trxAttchIds);
+
+            return trxAttachements;
+        }
+
+        public List<TestRun> GetTrxAttachements(List<int> runIds)
+        {
+            var atchsInfos = GetAttchmentsInfo(runIds);
+
+            var trxAttchIds = GetLastAttchsIdsByType(atchsInfos, ".trx");
+            var trxAttachements = GetTxrAttachments(trxAttchIds);
+
+            return trxAttachements;
+        }
+
+        public List<TestRun> GetTrxAttachementsSignleRun(int buildId, int runId)
+        {
+            var allAtchsInfos = GetAllBuildAttchmentsInfo(buildId);
+            var allAtchsInfo = allAtchsInfos.Where(r => r.runId == runId);
+
+            var trxAttchIds = GetLastAttchsIdsByType(allAtchsInfo, ".trx");
+            var trxAttachements = GetTxrAttachments(trxAttchIds);
+
+            return trxAttachements;
+        }
+
         public List<testsuites> GetJUnitAttachements(int buildId)
         {
             var allAtchsInfos = GetAllBuildAttchmentsInfo(buildId);
@@ -62,7 +96,7 @@ namespace TestRuns.Steps
             return trxAttachements;
         }
 
-        private List<(int runId, int attchId)> GetLastAttchsIdsByType(List<(int runId, AttachmentsInfo attchInfos)> runAttchInfos, string type)
+        private List<(int runId, int attchId)> GetLastAttchsIdsByType(IEnumerable<(int runId, AttachmentsInfo attchInfos)> runAttchInfos, string type)
         {
             var ids = new List<(int runId, int attchId)>();
             foreach (var (runId, attchInfos) in runAttchInfos)
@@ -87,6 +121,11 @@ namespace TestRuns.Steps
         {
             var runIds = testResultDetailApiClient.GetRunIds(buildId);
             
+            return runIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
+        }
+
+        private List<(int runId, AttachmentsInfo attchInfos)> GetAttchmentsInfo(List<int> runIds)
+        {
             return runIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
         }
     }

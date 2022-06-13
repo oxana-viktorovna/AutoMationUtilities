@@ -15,10 +15,15 @@ namespace TestRuns.Utilities
 
         public static ResultReport Convert(string[] data)
             => new ResultReport(
-                System.Convert.ToInt32(data[0]), 
+                ConvertToInt(data[0]), 
                 data[1], 
                 data[2], 
                 data[3].TrimStart('"').TrimEnd('"'), 
                 data[4]);
+
+        private static int ConvertToInt(string data)
+            => string.IsNullOrEmpty(data) 
+            ? 0 
+            : System.Convert.ToInt32(data);
     }
 }

@@ -1,0 +1,14 @@
+﻿{
+  "saveFolder": "",
+
+  "currentTestRun": {
+    "buildId": "",
+    "blockedTestRun": "",
+    "runDuration": "",
+    "runPostffix": ""
+  },
+  "previousTestRun": {
+    "buildId": "",
+    "runPostffix": ""
+  }
+}

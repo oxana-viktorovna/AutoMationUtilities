@@ -20,9 +20,23 @@ namespace TestRuns.Utilities
                 var sameResult = sameName.Where(result => LevenshteinDistance.Calculate(result.Error.Replace("\"", ""), previousResult.Error.Replace("\"", "")) < 15);
 
                 if (sameResult.Any())
-                {
                     sameResult.First().Comment = previousResult.Comment;
-                }
+            }
+
+            return currentResults;
+        }
+
+        public static List<ResultReport> CopyCommentsIgnoreError(
+            List<ResultReport> currentResults,
+            List<ResultReport> previousResults)
+        {
+            foreach (var previousResult in previousResults)
+            {
+                var sameName = currentResults
+                    .Where(result => result.TestMethodName.Equals(previousResult.TestMethodName));
+
+                if (sameName.Any())
+                    sameName.First().Comment = previousResult.Comment;
             }
 
             return currentResults;

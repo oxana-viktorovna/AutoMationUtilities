@@ -11,7 +11,7 @@ namespace TestRuns.Utilities
     {
         private const string XlsxFormat = ".xlsx";
         private const string DefaultSummaryFileName = "TestResultSummary_";
-        public void UpdateCurrentSummaryReport(string pathToSave, string buildNum, RunSummary uiSummary, RunSummary apiSummary, string runDuration)
+        public void UpdateCurrentSummaryReport(string pathToSave, string fileName, RunSummary uiSummary, RunSummary apiSummary, string runDuration)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var book = Read(Path.Combine(assemblyPath, @"Resources\TestResultSummary" + XlsxFormat));
@@ -24,18 +24,18 @@ namespace TestRuns.Utilities
 
             EvaluateFormulas(book);
 
-            var path = Path.Combine(pathToSave, DefaultSummaryFileName + buildNum + XlsxFormat);
+            var path = Path.Combine(pathToSave, DefaultSummaryFileName + fileName + XlsxFormat);
             Save(path, book);
         }
 
         public void UpdatePreviousSummaryReport(string path, string currBuildNum, string preBuildNum)
         {
-            if (string.IsNullOrEmpty(preBuildNum))
-                return;
-
             var curBookPath = Path.Combine(path, DefaultSummaryFileName + currBuildNum + XlsxFormat);
             var curBook = Read(curBookPath);
+            
             var preBook = Read(Path.Combine(path, DefaultSummaryFileName + preBuildNum + XlsxFormat));
+            if (preBook == null)
+                return;
 
             ISheet preSheet1 = preBook.GetSheetAt(0);
             var preUiRow = preSheet1.GetRow(3);

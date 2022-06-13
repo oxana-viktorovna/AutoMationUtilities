@@ -14,9 +14,9 @@ namespace TestRuns.Steps
         private const string DefaultUiFileName = "FailedUITests_";
         private const string DefaultApiFileName = "FailedAPITests_";
 
-        public void SaveUiFailedResults(string filePath, string buildNum, IEnumerable<TestRunUnitTestResult> testResults)
+        public void SaveUiFailedResults(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> testResults)
         {
-            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + buildNum + CsvFormat));
+            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
             var orderedResults = testResults.OrderBy(result => result.Output.ErrorInfo.Message).ToList();
 
             var fileContent = orderedResults.ToCsvFormat(csvWorker.Splitter);
@@ -54,20 +54,40 @@ namespace TestRuns.Steps
         public List<ResultReport> ReadUiReportResult(string filePath, string runTitle)
         {
             var csvWorker = new CsvWorker(Path.Combine(filePath, runTitle + CsvFormat));
-            var csvData = csvWorker.Read();
-            var reportResults = ResultReportConverter.Convert(csvData);
+            try
+            {
+                var csvData = csvWorker.Read();
+                var reportResults = ResultReportConverter.Convert(csvData);
+                
+                return reportResults;
+            }
+            catch (FileNotFoundException ex)
+            {
+                return null;
+            }
 
-            return reportResults;
         }
 
-        public void CompareResultsWithPrevious(string filePath, string preBuildNum, string currBuildNum)
+        public void CompareResultsWithPrevious(string filePath, string preFileName, string currFileName)
         {
-            if (string.IsNullOrEmpty(preBuildNum))
+            var previousResults = ReadUiReportResult(filePath, DefaultUiFileName + preFileName);
+            if (previousResults == null)
                 return;
 
-            var previousResults = ReadUiReportResult(filePath, DefaultUiFileName + preBuildNum);
-            var currentResults = ReadUiReportResult(filePath, DefaultUiFileName + currBuildNum);
+            var currentResults = ReadUiReportResult(filePath, DefaultUiFileName + currFileName);
             var currentResultsWithComments = ResultReportComparer.CopyComments(currentResults, previousResults);
+
+            SaveResultReport(filePath, DefaultUiFileName + currFileName, currentResultsWithComments);
+        }
+
+        public void CompareResultsWithPreviousIgnoreError(string filePath, string preBuildNum, string currBuildNum)
+        {
+            var previousResults = ReadUiReportResult(filePath, DefaultUiFileName + preBuildNum);
+            if (previousResults == null)
+                return;
+
+            var currentResults = ReadUiReportResult(filePath, DefaultUiFileName + currBuildNum);
+            var currentResultsWithComments = ResultReportComparer.CopyCommentsIgnoreError(currentResults, previousResults);
 
             SaveResultReport(filePath, DefaultUiFileName + currBuildNum, currentResultsWithComments);
         }

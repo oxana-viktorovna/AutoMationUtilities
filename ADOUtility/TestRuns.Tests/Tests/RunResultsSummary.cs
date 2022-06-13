@@ -1,5 +1,4 @@
 ﻿using ADOCore;
-using ADOCore.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using TestRuns.Steps;
@@ -8,7 +7,7 @@ using TestRuns.Utilities;
 namespace TestRuns
 {
     [TestClass]
-    public class RunResultsTests
+    public class RunResultsSummary
     {
         [TestInitialize]
         public void TestInit()
@@ -19,35 +18,30 @@ namespace TestRuns
             var testSettingsReader = new SettingsReader("TestRunTestConfig.json");
             testSettings = new TestRunTestSettings(testSettingsReader);
             apiSteps = new TestRunApiSteps(adoSettings);
-            fileSteps = new ReportFileSteps();
+            excelWorker = new RunSummaryWorker();
         }
 
         private AdoSettings adoSettings;
         private TestRunTestSettings testSettings;
         private TestRunApiSteps apiSteps;
-        private ReportFileSteps fileSteps;
+        private RunSummaryWorker excelWorker;
 
         [TestMethod]
-        public void GetUiRunFailedResults()
+        public void GetRunStatistic()
         {
-            var testResults = apiSteps.GetTrxAttachements(testSettings.CurrBuildId);
-            var uiFailedTests = testResults.GetFailedResults();
+            var statistic = apiSteps.GetRunStatistics(testSettings.CurrBuildId);
+            var uiSummary = statistic.GetUiStatistic();
+            var apiSummary = statistic.GetApiStatistic();
 
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
             var preBuildNum = apiSteps.GetBuildNumber(testSettings.PreviousBuildId);
 
-            fileSteps.SaveUiFailedResults(testSettings.SaveFolder, currBuildNum, uiFailedTests);
-            fileSteps.CompareResultsWithPrevious(testSettings.SaveFolder, preBuildNum, currBuildNum);
+            var currFileName = $"{currBuildNum}_{testSettings.CurrRunPostffix}";
+            excelWorker.UpdateCurrentSummaryReport(testSettings.SaveFolder, currFileName, uiSummary, apiSummary, testSettings.RunDuration);
+            
+            var preFileName = $"{preBuildNum}_{testSettings.PreviousRunPostffix}";
+            excelWorker.UpdatePreviousSummaryReport(testSettings.SaveFolder, currFileName, preFileName);
         }
 
-        [TestMethod]
-        public void GetApiRunFailedResults()
-        {
-            var testResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildId);
-            var failedResults = testResults.GetFailedTests();
-
-            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
-            fileSteps.SaveApiFailedResults(testSettings.SaveFolder, currBuildNum, failedResults);
-        }
     }
 }
