@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using ADOCore.Models;
+using SharedCore.StringUtilities;
+using System.Collections.Generic;
 using System.Linq;
 using TestRuns.Models;
 
@@ -20,6 +22,20 @@ namespace TestRuns.Utilities
                 data[2], 
                 data[3].TrimStart('"').TrimEnd('"'), 
                 data[4]);
+
+        public static List<ResultReport> Convert( List<TestRunUnitTestResult> results)
+        {
+            var resultReports = new List<ResultReport>();
+            foreach (var result in results)
+            {
+                var testName = result.testName.GetTestMethodName();
+                var resultReport = new ResultReport(0, result.testName.GetTestCaseNumber(), testName, result.Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "), "");
+
+                resultReports.Add(resultReport);
+            }
+
+            return resultReports;
+        }
 
         private static int ConvertToInt(string data)
             => string.IsNullOrEmpty(data) 

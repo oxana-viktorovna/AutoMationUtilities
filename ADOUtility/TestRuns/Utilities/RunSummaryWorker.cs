@@ -1,17 +1,30 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using SharedCore.FileUtilities.Excel;
-using System;
-using System.IO;
 using System.Reflection;
 using TestRuns.Models;
 
 namespace TestRuns.Utilities
 {
-    internal class RunSummaryWorker : ExcelWorker
+    public class RunSummaryWorker : ExcelWorker
     {
+        public RunSummaryWorker()
+        {
+        }
+
+        public RunSummaryWorker(string pathToSave, string fileName)
+        {
+            saveFile = Path.Combine(pathToSave, DefaultSummaryFileName + fileName + XlsxFormat);
+            savePath = pathToSave;
+        }
+
         private const string XlsxFormat = ".xlsx";
         private const string DefaultSummaryFileName = "TestResultSummary_";
-        public void UpdateCurrentSummaryReport(string pathToSave, string fileName, RunSummary uiSummary, RunSummary apiSummary, string runDuration)
+        private string saveFile;
+        private string savePath;
+
+        public void UpdateCurrentSummaryReport(RunSummary uiSummary, RunSummary apiSummary, string runDuration)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var book = Read(Path.Combine(assemblyPath, @"Resources\TestResultSummary" + XlsxFormat));
@@ -24,16 +37,14 @@ namespace TestRuns.Utilities
 
             EvaluateFormulas(book);
 
-            var path = Path.Combine(pathToSave, DefaultSummaryFileName + fileName + XlsxFormat);
-            Save(path, book);
+            Save(saveFile, book);
         }
 
-        public void UpdatePreviousSummaryReport(string path, string currBuildNum, string preBuildNum)
+        public void UpdatePreviousSummaryReport(string preBuildNum)
         {
-            var curBookPath = Path.Combine(path, DefaultSummaryFileName + currBuildNum + XlsxFormat);
-            var curBook = Read(curBookPath);
+            var curBook = Read(saveFile);
             
-            var preBook = Read(Path.Combine(path, DefaultSummaryFileName + preBuildNum + XlsxFormat));
+            var preBook = Read(Path.Combine(savePath, DefaultSummaryFileName + preBuildNum + XlsxFormat));
             if (preBook == null)
                 return;
 
@@ -49,7 +60,7 @@ namespace TestRuns.Utilities
 
             EvaluateFormulas(curBook);
 
-            Save(curBookPath, curBook);
+            Save(saveFile, curBook);
         }
 
 
@@ -62,7 +73,6 @@ namespace TestRuns.Utilities
             row.UpdateCell(4, runSummary.NotExecuted);
             row.UpdateCell(5, runSummary.Failed);
         }
-
 
         private void CopyDetailRow(IRow rowTo, IRow rowFrom)
         {

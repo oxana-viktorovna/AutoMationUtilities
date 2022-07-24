@@ -29,6 +29,10 @@ namespace SharedCore.Settings
             .Get<T>();
 
         public List<T> GetSettingArray<T>(string section)
-            => config.GetSection(section).Get<List<T>>();
+        { 
+            var values = config.GetSection(section).Get<List<T>>();
+
+            return values ?? new List<T>();
+        }
     }
 }

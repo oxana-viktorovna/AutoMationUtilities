@@ -1,6 +1,5 @@
-﻿using SharedCore.StringUtilities;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ADOCore.Models;
+using SharedCore.StringUtilities;
 using TestRuns.Models;
 
 namespace TestRuns.Utilities
@@ -21,6 +20,20 @@ namespace TestRuns.Utilities
 
                 if (sameResult.Any())
                     sameResult.First().Comment = previousResult.Comment;
+            }
+
+            return currentResults;
+        }
+
+        public static List<ResultReport> CopyBlockedComments(
+            List<ResultReport> currentResults,
+            List<ResultReport> previousResults)
+        {
+            var preNames = previousResults.Select(p => p.TestMethodName);
+            foreach (var currentResult in currentResults)
+            {
+                if (preNames.Contains(currentResult.TestMethodName))
+                    currentResult.Comment = previousResults.Where(p => p.TestMethodName.Equals(currentResult.TestMethodName)).First().Comment;
             }
 
             return currentResults;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TestRuns.Models
+﻿namespace TestRuns.Models
 {
     public record RunSummary
     {

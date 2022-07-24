@@ -3,7 +3,7 @@
 
   "currentTestRun": {
     "buildId": "",
-    "blockedTestRun": "",
+    "RerunBuildIds": [ ],
     "runDuration": "",
     "runPostffix": ""
   },

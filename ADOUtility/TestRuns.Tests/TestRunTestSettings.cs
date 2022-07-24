@@ -1,5 +1,6 @@
 ﻿using SharedCore.Settings;
 using System;
+using System.Collections.Generic;
 
 namespace TestRuns
 {
@@ -9,17 +10,17 @@ namespace TestRuns
         {
             SaveFolder = reader.GetSetting("saveFolder");
             CurrBuildId = GetIntSetting(reader, "currentTestRun:buildId");
+            Reruns = reader.GetSettingArray<int>("currentTestRun:RerunBuildIds");
             RunDuration = reader.GetSetting("currentTestRun:runDuration");
             PreviousBuildId = GetIntSetting(reader, "previousTestRun:buildId");
             CurrRunPostffix = GetPostfix(reader,"currentTestRun:runPostffix");
             PreviousRunPostffix = GetPostfix(reader,"previousTestRun:runPostffix");
-            BlockedTestRun = GetIntSetting(reader, "currentTestRun:blockedTestRun");
         }
 
         public string SaveFolder { get; private set; }
         public int CurrBuildId { get; private set; }
+        public List<int> Reruns { get; private set; }
         public string RunDuration { get; private set; }
-        public int BlockedTestRun { get; private set; }
         public int PreviousBuildId { get; private set; }
         public string CurrRunPostffix { get; private set; }
         public string PreviousRunPostffix { get; private set; }

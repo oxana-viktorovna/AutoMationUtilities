@@ -15,22 +15,15 @@ namespace ADOCore.ApiClietns
         {
         }
 
-        public List<int> GetRunIds(string runTitle, DateTime runDate)
+        public List<RunInfo> GetRunInfo(IEnumerable<int> runIds)
+            => runIds.Select(runId => GetRunInfo(runId)).ToList();
+
+        public RunInfo GetRunInfo(int runId)
         {
-            var minLastUpdatedDate = runDate.ToString("yyyy-MM-dd");
-            var maxLastUpdatedDate = (runDate.AddDays(2)).ToString("yyyy-MM-dd");
-            var parameters = new List<(string, string)>
-            {
-                ("runTitle", runTitle),
-                ("minLastUpdatedDate", minLastUpdatedDate),
-                ("maxLastUpdatedDate", maxLastUpdatedDate)
-            };
+            var response = SendAdoRequest($"test/Runs/{runId}", Method.GET);
+            var runsInfo = JsonSerializer.Deserialize<RunInfo>(response.Content);
 
-            var response = SendAdoRequest("test/Runs", Method.GET, parameters);
-            var runsInfo = JsonSerializer.Deserialize<RunInfoResponce>(response.Content);
-            var ids = runsInfo.value.Select(v => v.id);
-
-            return ids.ToList();
+            return runsInfo;
         }
 
         public RunStat GetRunStatistic(int runId)

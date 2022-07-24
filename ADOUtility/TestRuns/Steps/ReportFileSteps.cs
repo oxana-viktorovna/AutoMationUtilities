@@ -1,8 +1,5 @@
 ﻿using ADOCore.Models;
 using SharedCore.FileUtilities;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using TestRuns.Models;
 using TestRuns.Utilities;
 
@@ -14,12 +11,29 @@ namespace TestRuns.Steps
         private const string DefaultUiFileName = "FailedUITests_";
         private const string DefaultApiFileName = "FailedAPITests_";
 
-        public void SaveUiFailedResults(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> testResults)
+        public void SaveUiResults(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> testResults, bool isFailed = true)
         {
             var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
-            var orderedResults = testResults.OrderBy(result => result.Output.ErrorInfo.Message).ToList();
+            if (isFailed)
+                testResults = testResults.OrderBy(result => result.Output.ErrorInfo.Message);
 
-            var fileContent = orderedResults.ToCsvFormat(csvWorker.Splitter);
+            var fileContent = testResults.ToList().ToCsvFormat(csvWorker.Splitter);
+            csvWorker.Write(fileContent);
+        }
+
+        public void SaveUiPassedResultsWithDurationComapre(string filePath, string fileName, IEnumerable<(TestRunUnitTestResult currResult, DateTime preDuration)> durationComparer, string preBuildNumber)
+        {
+            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
+
+            var fileContent = durationComparer.ToList().ToCsvFormat(csvWorker.Splitter, preBuildNumber);
+            csvWorker.Write(fileContent);
+        }
+
+        public void SaveUiPassedResultsWithDuration(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> duration)
+        {
+            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
+
+            var fileContent = duration.ToList().ToCsvFormatWithDuration(csvWorker.Splitter);
             csvWorker.Write(fileContent);
         }
 
@@ -78,6 +92,15 @@ namespace TestRuns.Steps
             var currentResultsWithComments = ResultReportComparer.CopyComments(currentResults, previousResults);
 
             SaveResultReport(filePath, DefaultUiFileName + currFileName, currentResultsWithComments);
+        }
+
+        public List<ResultReport> CompareResultsWithBlockers(string filePath, string preFileName, List<ResultReport> currResults)
+        {
+            var previousResults = ReadUiReportResult(filePath, preFileName);
+            if (previousResults == null)
+                return currResults;
+
+            return ResultReportComparer.CopyBlockedComments(currResults, previousResults);
         }
 
         public void CompareResultsWithPreviousIgnoreError(string filePath, string preBuildNum, string currBuildNum)

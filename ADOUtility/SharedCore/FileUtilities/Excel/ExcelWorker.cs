@@ -51,5 +51,18 @@ namespace SharedCore.FileUtilities.Excel
                 HSSFFormulaEvaluator.EvaluateAllFormulaCells(workbook);
             }
         }
+
+        protected void Autosize(ISheet sheet)
+        {
+            int numberOfColumns = sheet.GetRow(1).PhysicalNumberOfCells;
+            for (int i = 1; i <= numberOfColumns; i++)
+            {
+                sheet.AutoSizeColumn(i);
+                GC.Collect();
+            }
+        }
+
+        protected int GetActualRowNum(int rowNum)
+            => rowNum + 1;
     }
 }

@@ -22,9 +22,10 @@ namespace ADOCore.ApiClients
 
             var response = SendAdoRequest("test/ResultDetailsByBuild", Method.GET, parameters, version: "7.0-preview");
             var resultDetails = JsonSerializer.Deserialize<ResultDetailsByBuildResponce>(response.Content);
-            var ids = resultDetails.resultsForGroup.SelectMany(rg => rg.results.Select(r => Convert.ToInt32(r.testRun.id))).Distinct();
+            var allids = resultDetails.resultsForGroup.SelectMany(rg => rg.results.Select(r => Convert.ToInt32(r.testRun.id)));
+            var ids = allids.Distinct().ToList();
 
-            return ids.ToList();
+            return ids;
         }
     }
 }

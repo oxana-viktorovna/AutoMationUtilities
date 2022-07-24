@@ -5,11 +5,12 @@ namespace ADOCore.Models
 {
     public class RunInfoResponce
     {
-        public Value[] value { get; set; }
+        [JsonProperty("Value")]
+        public RunInfo[] value { get; set; }
         public int count { get; set; }
     }
 
-    public class Value
+    public class RunInfo
     {
         public int id { get; set; }
         public string name { get; set; }

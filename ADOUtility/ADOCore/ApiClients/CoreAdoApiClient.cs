@@ -60,7 +60,7 @@ namespace ADOCore.ApiClients
                 }
             }
 
-            if (body != null)
+            if (method != Method.GET && body != null)
                 request.AddJsonBody(body);
 
             return request;

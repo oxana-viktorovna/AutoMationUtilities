@@ -23,7 +23,7 @@ namespace TestRuns.Utilities
 
         public static RunSummary GetUiStatistic(this IEnumerable<RunStat> runStats)
         {
-            var uiStats = runStats.Where(rstst => !rstst.run.name.Contains(".xml")); 
+            var uiStats = runStats.Where(rstst => !rstst.run.name.Contains(".xml")).Where(rstst => !rstst.run.name.Contains("DataPreparation"));
             var outcomeStat = GetOutcomeStat(uiStats);
 
             return new RunSummary
