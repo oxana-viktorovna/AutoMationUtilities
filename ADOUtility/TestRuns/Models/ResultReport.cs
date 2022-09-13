@@ -5,30 +5,49 @@ namespace TestRuns.Models
     public class ResultReport
     {
         public ResultReport(
-            int num, 
+            int num,
+            string reason,
             string testcase, 
             string testMethod, 
-            string error, 
-            string comment)
+            string error 
+            )
         {
             Number = num;
             TestCaseNumber = testcase;
             TestMethodName = testMethod;
             Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
-            Comment = comment;
+            Reason = reason;
+        }
+
+        public ResultReport(
+            string reason,
+            string testcase,
+            string testMethod,
+            string error
+            )
+        {
+            Number = 0;
+            TestCaseNumber = testcase;
+            TestMethodName = testMethod;
+            Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
+            Reason = reason;
         }
 
         public int Number { get; set; }
         public string TestCaseNumber { get; set; }
         public string TestMethodName { get; set; }
         public string Error { get; set; }
-        public string Comment { get; set; }
+        public string Reason { get; set; }
     }
 
     public static class ResultReportExtension
     {
         public static string ToCsvLine(this ResultReport result, string splitter)
-        => result.Number+ splitter+result.TestCaseNumber + splitter + result.TestMethodName + splitter + result.Error + splitter + result.Comment;
+        => result.Number + splitter 
+            + result.Reason  + splitter 
+            + result.TestCaseNumber + splitter 
+            + result.TestMethodName + splitter 
+            + result.Error;
 
         public static StringBuilder ToCsvFormat(this IEnumerable<ResultReport> results, string splitter)
         {
@@ -37,10 +56,10 @@ namespace TestRuns.Models
             var headers = new List<string>()
             {
             "N",
+            "Reason",
             "Test Case N",
             "Test Method Name",
-            "Error",
-            "Comment"
+            "Error"
             };
             strbuilder.AppendLine(string.Join(splitter, headers));
 

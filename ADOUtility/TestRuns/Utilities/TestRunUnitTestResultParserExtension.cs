@@ -12,10 +12,10 @@ namespace TestRuns.Utilities
             var headers = new List<string>()
             {
             "N",
+            "Reason",
             "Test Case N",
             "Test Method Name",
-            "Error",
-            "Comment"
+            "Error"
             };
             csv.AppendLine(string.Join(splitter, headers));
 
@@ -29,10 +29,10 @@ namespace TestRuns.Utilities
                 catch { }
 
                 csv.AppendLine(i + 1 + splitter +
+                    "" + splitter +
                 testResults[i].testName.GetTestCaseNumber() + splitter +
                 testResults[i].testName.GetTestMethodName() + splitter +
-                error + splitter +
-                " "
+                error
                 );
             }
 

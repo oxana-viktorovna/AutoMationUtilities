@@ -1,15 +1,14 @@
 ﻿using ADOCore;
 using ADOCore.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SharedCore.FileUtilities;
 using SharedCore.Settings;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using TestRuns.Models;
 using TestRuns.Steps;
+using TestRuns.Utilities;
 
 namespace TestRuns
 {
@@ -37,51 +36,88 @@ namespace TestRuns
         private string blockedPattern;
 
         [TestMethod]
-        public void GetUiRunFailedResultsByBuild()
+        public void GetAllUiTestResultsByBuildId()
         {
-            var testResults = apiSteps.GetTrxAttachementsExcludeRun(testSettings.CurrBuildId, blockedPattern, Outcome.Failed);
-            var uiFailedTests = testResults.GetFailedResults();
+            var allTestResults = apiSteps.GetAllTrxRunResults(testSettings.CurrBuildId);
+            var uiPassedTests = allTestResults.GetPassedResults();
+            var uiFailedTests = allTestResults.GetFailedResults();
+
+            var allSelectedTestResults = new List<TestRunUnitTestResult>();
+            allSelectedTestResults.AddRange(uiPassedTests);
+            allSelectedTestResults.AddRange(uiFailedTests);
 
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
-            var preBuildNum = apiSteps.GetBuildNumber(testSettings.PreviousBuildId);
-
             var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiFailedTests);
 
-            var preFileName = $"{preBuildNum}{testSettings.PreviousRunPostffix}";
-            fileSteps.CompareResultsWithPrevious(testSettings.SaveFolder, preFileName, currFileName);
+            fileSteps.SaveAllUiResults(testSettings.SaveFolder, currFileName, allSelectedTestResults);
         }
 
         [TestMethod]
-        public void GetUiRunBlockedFailedResults()
+        public void GetFailedUiRunResultsByBuild()
         {
-            var testResults = apiSteps.GetTrxAttachementsSignleRun(testSettings.CurrBuildId, blockedPattern, Outcome.Failed);
-            var uiFailedTests = testResults.GetFailedResults();
+            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedTests = allTestResultsExcludeBlocked.GetFailedResults();
+
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
+            var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
+
+            var fullFailedTests = new List<ResultReport>();
+            fullFailedTests.AddRange(ResultReportConverter.Convert(uiFailedTests));
+            fullFailedTests.AddRange(uiFailedBlockedTestsWithComments);
 
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
-            var preBuildNum = apiSteps.GetBuildNumber(testSettings.PreviousBuildId);
-
-            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}_Blocked";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiFailedTests);
-
-            var preFileName = $"{preBuildNum}{testSettings.PreviousRunPostffix}_Blocked";
-            fileSteps.CompareResultsWithPreviousIgnoreError(testSettings.SaveFolder, preFileName, currFileName);
+            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
+            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, fullFailedTests);
         }
 
         [TestMethod]
-        public void GetUiRunBlockedPassedResults()
+        public void GetFailedUiRunResultsByBuilds()
         {
-            var currTestResults = apiSteps.GetTrxAttachementsSignleRun(testSettings.CurrBuildId, blockedPattern, Outcome.Passed);
-            var currUiPassedTests = currTestResults.GetPassedResults();
+            var allBuildIds = apiSteps.GetAllBuildsIds(testSettings.CurrBuildId, testSettings.Reruns);
+
+            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(allBuildIds, blockedPattern);
+            var uiFailedTests = allTestResultsExcludeBlocked.GetFailedResults();
+
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
+            var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
+
+            var fullFailedTests = new List<ResultReport>();
+            fullFailedTests.AddRange(ResultReportConverter.Convert(uiFailedTests));
+            fullFailedTests.AddRange(uiFailedBlockedTestsWithComments);
 
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
+            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
+            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, fullFailedTests);
+        }
 
+        [TestMethod]
+        public void GetFailedUiBlockedRunResults()
+        {
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
+            var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
+
+            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
+            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}_FailedBlocked";
+            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiFailedBlockedTestsWithComments);
+        }
+
+        [TestMethod]
+        public void GetPassedUiBlockedRunResults()
+        {
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiPassedBlockedTests = allTestResultsIncludeBlocked.GetPassedResults();
+            var uiPassedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiPassedBlockedTests, testSettings.SaveFolder);
+
+            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
             var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}_PassedBlocked";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, currUiPassedTests, false);
+            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiPassedBlockedTestsWithComments);
         }
 
         [TestMethod]
-        public void GetApiRunFailedResults()
+        public void GetFailedApiRunResults()
         {
             var testResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildId);
             var failedResults = testResults.GetFailedTests();
@@ -93,10 +129,8 @@ namespace TestRuns
         [TestMethod]
         public void GetReRunString()
         {
-            var build = testSettings.CurrBuildId;
-            //var build = testSettings.Reruns[0];
-            var testResults = apiSteps.GetTrxAttachementsExcludeRun(build, blockedPattern, Outcome.Failed);
-            var uiFailedTests = testResults.GetFailedResults();
+            var allTestResults = apiSteps.GetAllTrxRunResultsExcludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedTests = allTestResults.GetFailedResults();
 
             var rerunString = new StringBuilder();
             rerunString.Append("&(");
@@ -113,19 +147,19 @@ namespace TestRuns
         [TestMethod]
         public void GetUiRunDurationCompare()
         {
-            var currTestResults = apiSteps.GetTrxAttachements(testSettings.CurrBuildId, Outcome.Passed);
-            var currUiPassedTests = currTestResults.GetPassedResults();
+            var currAllTestResults = apiSteps.GetAllTrxRunResults(testSettings.CurrBuildId);
+            var currUiPassedTests = currAllTestResults.GetPassedResults();
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
 
-            var preTestResults = apiSteps.GetTrxAttachements(testSettings.PreviousBuildId, Outcome.Passed);
-            var preUiPassedTests = preTestResults.GetPassedResults();
+            var preAllTestResults = apiSteps.GetAllTrxRunResults(testSettings.PreviousBuildId);
+            var preUiPassedTests = preAllTestResults.GetPassedResults();
+            var preUiTestNames = preUiPassedTests.Select(t => t.testName);
             var preBuildNum = apiSteps.GetBuildNumber(testSettings.PreviousBuildId);
-            var preTestNames = preUiPassedTests.Select(t => t.testName);
 
             List<(TestRunUnitTestResult currResult, DateTime preDuration)> dureactionCompare = new();
             foreach (var currUiPassedTest in currUiPassedTests)
             {
-                if (preTestNames.Contains(currUiPassedTest.testName))
+                if (preUiTestNames.Contains(currUiPassedTest.testName))
                 {
                     var preUiPassedTest = preUiPassedTests.FirstOrDefault(t => t.testName == currUiPassedTest.testName);
                     dureactionCompare.Add((currUiPassedTest, preUiPassedTest.duration));
@@ -139,12 +173,13 @@ namespace TestRuns
         [TestMethod]
         public void GetUiRunDuration()
         {
-            var currTestResults = apiSteps.GetTrxAttachements(testSettings.CurrBuildId, Outcome.Passed);
-            var currUiPassedTests = currTestResults.GetPassedResults();
-            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
+            var allTestResults = apiSteps.GetAllTrxRunResults(testSettings.CurrBuildId);
+            var uiPassedTests = allTestResults.GetPassedResults();
 
+            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
             var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}_Duration";
-            fileSteps.SaveUiPassedResultsWithDuration(testSettings.SaveFolder, currFileName, currUiPassedTests);
+
+            fileSteps.SaveUiPassedResultsWithDuration(testSettings.SaveFolder, currFileName, uiPassedTests);
         }
     }
 }

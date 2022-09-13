@@ -1,7 +1,9 @@
 using ADOCore;
 using ADOCore.ApiClietns;
+using ADOCore.Models.VariableGroups;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
+using System.Collections.Generic;
 using System.IO;
 using VarGroups.Tests.Ulitlities;
 
@@ -23,14 +25,37 @@ namespace VarGroups.Tests
         private VariableGroupsApiClient apiClient;
 
         [TestMethod]
-        public void GetVarGroup()
+        public void GetVarGroups()
         {
-            var envName = "Testauto1";
-            var varGroupName = VarGroupNamesGenerator.GenerateVarGroupName(envName);
-            var varGroup = apiClient.GetVariableGroup(varGroupName);
-            var yaml = varGroup.ToYamlStr();
-            var path = $"C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\Pipelines\\{envName}.yml";
-            File.WriteAllText(path, yaml);
+            var envNames = new List<string>() 
+            {
+                "Highlander","Testauto1","Testauto3","UkIntegration","UkNewInf","UKQA","UKQA1","UsBrest2","UsIntegration","UsMilkyWay","UsNewInf","UsPlatform","UsPlatform2sa","USQA","USQA1","UsRacoons2"
+            };
+
+            List<VariableGroup> varGroups = new();
+            foreach (var envName in envNames)
+            {
+                var varGroupName = VarGroupNamesGenerator.GenerateVarGroupName(envName);
+                var varGroup = apiClient.GetVariableGroup(varGroupName);
+                varGroups.Add(varGroup);
+               
+            }
+
+            var equalVariables = varGroups.GetEqualValuesKeysValue();
+            var equalKeys = equalVariables.GetAllKeys();
+            var varsToInclude = varGroups.GetAllKeys();
+
+            foreach (var varGroup in varGroups)
+            {
+                var yaml = varGroup.ToYamlStr(equalKeys, varsToInclude, out string envHost);
+                var path = $"C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\Pipelines\\{envHost}.yml";
+                File.WriteAllText(path, yaml);
+            }
+
+            var commonyaml = equalVariables.ToYamlStr();
+            var commonpath = $"C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\Pipelines\\common-env-data.yml";
+            File.WriteAllText(commonpath, commonyaml);
         }
+
     }
 }

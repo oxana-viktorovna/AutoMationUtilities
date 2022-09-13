@@ -21,6 +21,22 @@ namespace TestRuns.Steps
             csvWorker.Write(fileContent);
         }
 
+        public void SaveUiResults(string filePath, string fileName, IEnumerable<ResultReport> testResults)
+        {
+            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
+
+            var fileContent = testResults.Where(result => result != null).ToList().ToCsvFormat(csvWorker.Splitter);
+            csvWorker.Write(fileContent);
+        }
+
+        public void SaveAllUiResults(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> testResults)
+        {
+            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
+
+            var fileContent = testResults.ToList().ToCsvFormat(csvWorker.Splitter);
+            csvWorker.Write(fileContent);
+        }
+
         public void SaveUiPassedResultsWithDurationComapre(string filePath, string fileName, IEnumerable<(TestRunUnitTestResult currResult, DateTime preDuration)> durationComparer, string preBuildNumber)
         {
             var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));

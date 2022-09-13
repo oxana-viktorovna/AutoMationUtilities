@@ -21,7 +21,6 @@ namespace TestRuns
             var testSettingsReader = new SettingsReader("TestRunTestConfig.json");
             testSettings = new TestRunTestSettings(testSettingsReader);
             apiSteps = new TestRunApiSteps(adoSettings);
-            fileSteps = new ReportFileSteps();
 
             blockedPattern = "[b|B]locked";
         }
@@ -29,12 +28,12 @@ namespace TestRuns
         private AdoSettings adoSettings;
         private TestRunTestSettings testSettings;
         private TestRunApiSteps apiSteps;
-        private ReportFileSteps fileSteps;
         private string blockedPattern;
 
         [TestMethod]
         public void CreateFullRunReport()
-        {
+        {           
+            var allBuildIds = apiSteps.GetAllBuildsIds(testSettings.CurrBuildId, testSettings.Reruns);
             var mainStatistic = apiSteps.GetRunStatistics(testSettings.CurrBuildId);
             var uiSummary = mainStatistic.GetUiStatistic();
             var apiSummary = mainStatistic.GetApiStatistic();
@@ -59,20 +58,26 @@ namespace TestRuns
             summaryReportBuilder.CreateNewSummaryReport(testSettings.RunDuration);
             summaryReportBuilder.CreateUiSummary((testSettings.CurrBuildId, uiSummary), reRunsUiSummary);
             summaryReportBuilder.CreateApiSummary(totalNumOfRuns, (testSettings.CurrBuildId, apiSummary), reRunsApiSummary);
+            summaryReportBuilder.CreateScriptSummary(totalNumOfRuns, (testSettings.CurrBuildId, apiSummary), reRunsApiSummary);
             summaryReportBuilder.CreateMainTotals(totalNumOfRuns);
 
-            var uiReportBuilser = new RunNewUiSummaryBuilder(reportBuilder.Book);
-            var reRunUiTestResults = apiSteps.GetTrxAttachementsExcludeRun(testSettings.CurrBuildId, testSettings.Reruns, blockedPattern, Outcome.Passed);
-            var uiFailedTests = ResultReportConverter.Convert(reRunUiTestResults.GetFailedResults());
-            var uiBlockedFailedTests = apiSteps.CopyCommentsForBlocked(testSettings.CurrBuildId, blockedPattern, testSettings.SaveFolder);
-            uiReportBuilser.CreateFullFailedUiReport(uiFailedTests, uiBlockedFailedTests);
+            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
+
+            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(allBuildIds, blockedPattern);
+            var uiFailedTests = allTestResultsExcludeBlocked.GetFailedResults();
+
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
+            var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
+
+            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(uiFailedTests), uiFailedBlockedTestsWithComments);
 
             var apiReportBuilder = new RunNewApiSummaryBuilder(reportBuilder.Book);
             var apiTestResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildId, testSettings.Reruns);
             var apiFailedResults = apiTestResults.GetFailedTests();
             apiReportBuilder.CreateFullFailedApiReport(apiFailedResults);
 
-            reportBuilder.SaveReport();
+            reportBuilder.SaveReport();           
         }
     }
 }

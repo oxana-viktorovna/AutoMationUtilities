@@ -26,6 +26,15 @@ namespace TestRuns.Steps
                 ? string.Empty
                 : buildsApiClient.GetBuild(buildId).buildNumber;
 
+        public List<int> GetAllBuildsIds(int buildId, List<int> rerunsBuildIds)
+        {
+            var allRuns = new List<int>() { buildId };
+            if (rerunsBuildIds is not null)
+                allRuns.AddRange(rerunsBuildIds);
+
+            return allRuns;
+        }
+
         public List<RunStat> GetRunStatistics(int buildId)
         {
             var runIds = testResultDetailApiClient.GetRunIds(buildId);
@@ -33,65 +42,137 @@ namespace TestRuns.Steps
             return testRunApiClient.GetRunStatistic(runIds);
         }
 
-        public List<TestRun> GetTrxAttachements(int buildId, Outcome outcome)
-        {
-            var allAtchsInfos = GetAllBuildAttchmentsInfo(buildId);
+        #region Trx
 
-            return outcome switch
-            {
-                Outcome.Passed => GetAttachementsPassed(allAtchsInfos),
-                _ => GetAttachementsFailed(allAtchsInfos),
-            };
+        public IEnumerable<TestRunUnitTestResult> GetAllTrxRunResults(int buildId)
+        {
+            var allTestRuns = GetTrxAttachements(buildId);
+            var allTestResults = allTestRuns.GetAllRunResults();
+
+            return allTestResults;
         }
 
-        public List<TestRun> GetTrxAttachementsExcludeRun(int buildId, string runNamePatternToExclude, Outcome outcome)
+        public IEnumerable<TestRunUnitTestResult> GetAllTrxRunResultsExcludeRun(int buildId, string runNamePatternToExclude)
         {
-            var allAtchsInfos = GetBuildAttchmentsInfo(buildId, runNamePatternToExclude, true);
+            var allTestRuns = GetTrxAttachementsExcludeRun(buildId, runNamePatternToExclude);
+            var allTestResults = allTestRuns.GetAllRunResults();
 
-            return outcome switch
-            {
-                Outcome.Passed => GetAttachementsPassed(allAtchsInfos),
-                _ => GetAttachementsFailed(allAtchsInfos),
-            };
+            return allTestResults;
         }
 
-        public List<TestRun> GetTrxAttachementsExcludeRun(int buildId, List<int> rerunsBuildIds, string runNamePatternToExclude, Outcome outcome)
+        public IEnumerable<TestRunUnitTestResult> GetAllTrxRunResultsExcludeRun(List<int> allBuildIds, string runNamePatternToExclude)
         {
-            var allRuns = new List<int>() { buildId };
-            if (rerunsBuildIds is not null)
-                allRuns.AddRange(rerunsBuildIds);
+            var allTestRuns = GetTrxAttachementsExcludeRun(allBuildIds, runNamePatternToExclude);
+            var allTestResults = allTestRuns.GetAllRunResults();
 
-            var reRunUiTestResults = new List<TestRun>();
-
-            foreach (var run in allRuns)
-            {
-                reRunUiTestResults.AddRange(GetTrxAttachementsExcludeRun(run, runNamePatternToExclude, outcome));
-            }
-
-            return reRunUiTestResults;
+            return allTestResults;
         }
 
-        public List<TestRun> GetTrxAttachementsSignleRun(int buildId, string runNamePatternToInclude, Outcome outcome)
+        public IEnumerable<TestRunUnitTestResult> GetAllTrxRunResultsIncludeRun(int buildId, string runNamePatternToInclude)
         {
-            var allAtchsInfos = GetBuildAttchmentsInfo(buildId, runNamePatternToInclude, false);
+            var allTestRuns = GetTrxAttachementsIncludeRun(buildId, runNamePatternToInclude);
+            var allTestResults = allTestRuns.GetAllRunResults();
 
-            return outcome switch
-            {
-                Outcome.Passed => GetAttachementsPassed(allAtchsInfos),
-                _ => GetAttachementsFailed(allAtchsInfos),
-            };
+            return allTestResults;
+        }
+
+        public List<TestRun> GetTrxAttachements(int buildId)
+        {
+            var allAtchsInfos = GetAttchmentsInfoByBuildId(buildId);
+
+            return GetTxrAttachments(allAtchsInfos);
         }
 
         public List<TestRun> GetTrxAttachements(List<int> runIds)
         {
-            var allAtchsInfos = GetAttchmentsInfo(runIds);
+            var allAtchsInfos = GetAttchmentsInfoByRunIds(runIds);
 
-            return GetAttachementsFailed(allAtchsInfos);
+            return GetTxrAttachments(allAtchsInfos);
         }
+
+        public List<TestRun> GetTrxAttachementsExcludeRun(List<int> allBuildIds, string runNamePatternToExclude)
+            => allBuildIds.SelectMany(buildId => GetTrxAttachementsExcludeRun(buildId, runNamePatternToExclude)).ToList();
+
+        public List<TestRun> GetTrxAttachementsExcludeRun(int buildId, string runNamePatternToExclude)
+        {
+            var allAtchsInfos = GetAttchmentsInfoByBuildId(buildId, runNamePatternToExclude, true);
+
+            return GetTxrAttachments(allAtchsInfos);
+        }
+
+        public List<TestRun> GetTrxAttachementsIncludeRun(int buildId, string runNamePatternToInclude)
+        {
+            var allAtchsInfos = GetAttchmentsInfoByBuildId(buildId, runNamePatternToInclude, false);
+
+            return GetTxrAttachments(allAtchsInfos);
+        }
+
+        public List<ResultReport> CopyCommentsForBlocked(IEnumerable<TestRunUnitTestResult> blockedTests, string saveFolder)
+        {
+            if (!blockedTests.Any())
+                return null;
+
+            var uiFailedBlockedTests = ResultReportConverter.Convert(blockedTests.GetFailedResults());
+            var uiFailedBlockedTestsWithComments = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blockers", uiFailedBlockedTests);
+
+            return uiFailedBlockedTestsWithComments;
+        }
+
+        private List<TestRun> GetTxrAttachments(IEnumerable<(int runId, int attchId)> ids)
+            => ids.Select(raId => testRunApiClient.GetTrxResults(raId.runId, raId.attchId)).ToList();
+
+        private List<TestRun> GetTxrAttachments(List<(int runId, AttachmentsInfo attchInfos)> attchmentsInfos)
+        {
+            var trxAttchIds = GetAttchsIdsByType(attchmentsInfos, ".trx");
+
+            return GetTxrAttachments(trxAttchIds);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="buildId"></param>
+        /// <param name="runNamePattern"></param>
+        /// <param name="toExclude">false will include only runs by pattern. true will exclude runs by pattern.</param>
+        /// <returns></returns>
+        private List<(int runId, AttachmentsInfo attchInfos)> GetAttchmentsInfoByBuildId(
+            int buildId,
+            string runNamePattern = "",
+            bool toExclude = false)
+        {
+            var runIds = testResultDetailApiClient.GetRunIds(buildId);
+
+            if (!string.IsNullOrEmpty(runNamePattern))
+                runIds = SelectRunIdsByPattern(runIds, runNamePattern, toExclude);
+
+            return GetAttchmentsInfoByRunIds(runIds);
+        }
+
+        private List<(int runId, AttachmentsInfo attchInfos)> GetAttchmentsInfoByRunIds(List<int> runIds)
+            => runIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
+
+        private List<int> SelectRunIdsByPattern(
+            List<int> initialRunIds,
+            string runNamePattern,
+            bool toExclude)
+        {
+            var runInfos = testRunApiClient.GetRunInfo(initialRunIds);
+            var regex = new Regex(runNamePattern);
+            var selectedRunInfos = toExclude
+                ? runInfos.Where(runInfo => !regex.IsMatch(runInfo.name))
+                : runInfos.Where(runInfo => regex.IsMatch(runInfo.name));
+            var runIds = selectedRunInfos.Select(runInfo => runInfo.id).ToList();
+
+            return runIds;
+        }
+
+        #endregion Trx
+
+        #region JUnit
 
         public List<testsuites> GetJUnitAttachements(int buildId)
         {
-            var allAtchsInfos = GetAllBuildAttchmentsInfo(buildId);
+            var allAtchsInfos = GetAttchmentsInfoByBuildId(buildId);
             var trxAttchIds = GetLastAttchsIdsByType(allAtchsInfos, ".xml");
             var trxAttachements = GetJUnitAttachments(trxAttchIds);
 
@@ -116,14 +197,10 @@ namespace TestRuns.Steps
             return apiTestResults;
         }
 
-        public List<ResultReport> CopyCommentsForBlocked(int buildId, string blockedPattern, string saveFolder)
-        {
-            var blockedTestResults = GetTrxAttachementsSignleRun(buildId, blockedPattern, Outcome.Failed);
-            var uiFailedBlockedTests = ResultReportConverter.Convert(blockedTestResults.GetFailedResults());
-            var uiFailedBlockedTestsWithComments = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blocked", uiFailedBlockedTests);
+        private List<testsuites> GetJUnitAttachments(IEnumerable<(int runId, int attchId)> ids)
+            => ids.Select(raId => testRunApiClient.GetJUnitReport(raId.runId, raId.attchId)).ToList();
 
-            return uiFailedBlockedTestsWithComments;
-        }
+        #endregion JUnit
 
         private static List<(int runId, int attchId)> GetLastAttchsIdsByType(IEnumerable<(int runId, AttachmentsInfo attchInfos)> runAttchInfos, string type)
         {
@@ -153,54 +230,6 @@ namespace TestRuns.Steps
             }
 
             return ids;
-        }
-
-        private List<TestRun> GetTxrAttachments(IEnumerable<(int runId, int attchId)> ids)
-            => ids.Select(raId => testRunApiClient.GetTrxResults(raId.runId, raId.attchId)).ToList();
-
-        private List<testsuites> GetJUnitAttachments(IEnumerable<(int runId, int attchId)> ids)
-            => ids.Select(raId => testRunApiClient.GetJUnitReport(raId.runId, raId.attchId)).ToList();
-
-        private List<(int runId, AttachmentsInfo attchInfos)> GetBuildAttchmentsInfo(
-            int buildId,
-            string runNamePattern,
-            bool toExclude = false)
-        {
-            var regex = new Regex(runNamePattern);
-            var runIds = testResultDetailApiClient.GetRunIds(buildId);
-            var runInfos = testRunApiClient.GetRunInfo(runIds);
-            var selectedRunInfos = toExclude
-                ? runInfos.Where(runInfo => !regex.IsMatch(runInfo.name))
-                : runInfos.Where(runInfo => regex.IsMatch(runInfo.name));
-            var selectedRunIds = selectedRunInfos.Select(runInfo => runInfo.id).ToList();
-
-            return selectedRunIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
-        }
-
-        private List<(int runId, AttachmentsInfo attchInfos)> GetAllBuildAttchmentsInfo(int buildId)
-        {
-            var runIds = testResultDetailApiClient.GetRunIds(buildId);
-
-            return runIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
-        }
-
-        private List<(int runId, AttachmentsInfo attchInfos)> GetAttchmentsInfo(List<int> runIds)
-        {
-            return runIds.Select(runId => (runId, testRunApiClient.GetAttachmentsInfo(runId))).ToList();
-        }
-
-        private List<TestRun> GetAttachementsFailed(IEnumerable<(int runId, AttachmentsInfo attchInfos)> allAtchsInfos)
-        {
-            var trxAttchIds = GetLastAttchsIdsByType(allAtchsInfos, ".trx");
-
-            return GetTxrAttachments(trxAttchIds);
-        }
-
-        private List<TestRun> GetAttachementsPassed(IEnumerable<(int runId, AttachmentsInfo attchInfos)> allAtchsInfos)
-        {
-            var trxAttchIds = GetAttchsIdsByType(allAtchsInfos, ".trx");
-
-            return GetTxrAttachments(trxAttchIds);
         }
     }
 }

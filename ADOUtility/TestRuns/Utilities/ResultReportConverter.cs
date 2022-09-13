@@ -1,7 +1,5 @@
 ﻿using ADOCore.Models;
 using SharedCore.StringUtilities;
-using System.Collections.Generic;
-using System.Linq;
 using TestRuns.Models;
 
 namespace TestRuns.Utilities
@@ -16,20 +14,26 @@ namespace TestRuns.Utilities
         }
 
         public static ResultReport Convert(string[] data)
-            => new ResultReport(
-                ConvertToInt(data[0]), 
-                data[1], 
-                data[2], 
-                data[3].TrimStart('"').TrimEnd('"'), 
-                data[4]);
+        {
+            var error = data.Count() == 5 
+                ? data[4].TrimStart('"').TrimEnd('"')
+                : String.Empty;
+            return new ResultReport(
+                data[1],
+                data[2],
+                data[3],
+                error
+                );
+        }
 
         public static List<ResultReport> Convert( List<TestRunUnitTestResult> results)
         {
             var resultReports = new List<ResultReport>();
-            foreach (var result in results)
+
+            for (int i = 0; i < results.Count; i++)
             {
-                var testName = result.testName.GetTestMethodName();
-                var resultReport = new ResultReport(0, result.testName.GetTestCaseNumber(), testName, result.Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "), "");
+                var testName = results[i].testName.GetTestMethodName();
+                var resultReport = new ResultReport(i + 1, "", results[i].testName.GetTestCaseNumber(), testName, results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "));
 
                 resultReports.Add(resultReport);
             }

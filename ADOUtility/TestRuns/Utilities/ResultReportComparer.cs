@@ -10,7 +10,7 @@ namespace TestRuns.Utilities
             List<ResultReport> currentResults,
             List<ResultReport> previousResults)
         {
-            var previousResultWithComment = previousResults.Where(result => !result.Comment.Equals(TestRunConstants.DefaultComment));
+            var previousResultWithComment = previousResults.Where(result => !result.Reason.Equals(TestRunConstants.DefaultComment));
 
             foreach (var previousResult in previousResultWithComment)
             {
@@ -19,7 +19,7 @@ namespace TestRuns.Utilities
                 var sameResult = sameName.Where(result => LevenshteinDistance.Calculate(result.Error.Replace("\"", ""), previousResult.Error.Replace("\"", "")) < 15);
 
                 if (sameResult.Any())
-                    sameResult.First().Comment = previousResult.Comment;
+                    sameResult.First().Reason = previousResult.Reason;
             }
 
             return currentResults;
@@ -33,7 +33,7 @@ namespace TestRuns.Utilities
             foreach (var currentResult in currentResults)
             {
                 if (preNames.Contains(currentResult.TestMethodName))
-                    currentResult.Comment = previousResults.Where(p => p.TestMethodName.Equals(currentResult.TestMethodName)).First().Comment;
+                    currentResult.Reason = previousResults.Where(p => p.TestMethodName.Equals(currentResult.TestMethodName)).First().Reason;
             }
 
             return currentResults;
@@ -49,7 +49,7 @@ namespace TestRuns.Utilities
                     .Where(result => result.TestMethodName.Equals(previousResult.TestMethodName));
 
                 if (sameName.Any())
-                    sameName.First().Comment = previousResult.Comment;
+                    sameName.First().Reason = previousResult.Reason;
             }
 
             return currentResults;

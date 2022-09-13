@@ -40,6 +40,18 @@ namespace TestRuns.Utilities
             CreateTypeSummary(GetApiTotalRowNum(uiRunsNum), "API", runs);
         }
 
+        public void CreateScriptSummary(int reRunsNum, (int buildId, RunSummary summary) originalRun, List<(int buildId, RunSummary summary)> reruns)
+        {
+            var runs = new List<(int, RunSummary)>();
+            runs.Add((originalRun.buildId, null));
+            foreach (var rerun in reruns)
+            {
+                runs.Add((rerun.buildId, null));
+            }
+
+            CreateTypeSummary(GetScriptsTotalRowNum(reRunsNum, runs.Count), "Script", runs);
+        }
+
         private void CreateTypeSummary(int totalsRowNum, string testType, List<(int buildId, RunSummary summary)> runs)
         {
             var nonEmpltyRowsCount = 0;
@@ -59,6 +71,9 @@ namespace TestRuns.Utilities
 
         private int GetApiTotalRowNum(int uiRunsNum)
             => 5 + 1 + uiRunsNum;
+
+        private int GetScriptsTotalRowNum(int uiRunsNum, int apiRunsNum)
+            => 5 + 1 + uiRunsNum + 1 + apiRunsNum;
 
         private void CreateHeaders(string runDurection)
         {
@@ -142,6 +157,9 @@ namespace TestRuns.Utilities
 
         private bool CreateRunTotals((int buildId, RunSummary summary) run, int rowNum, bool isOrig = false)
         {
+            if (run.summary == null)
+                return false;
+
             if (run.summary.Passed + run.summary.NotExecuted + run.summary.Failed == 0)
                 return false;
 
@@ -149,12 +167,15 @@ namespace TestRuns.Utilities
             var title = isOrig ? "Run" : "Re-Run";
             row.CreateCell(1, title);
             row.AddHyperLink(1, $"https://dev.azure.com/tr-corp-legal-tracker/Tracker/_build/results?buildId={run.buildId}&view=ms.vss-test-web.build-test-results-tab", stylesBuilder.GetHyperlinkStyle());
-            row.CreateCellWithFormula(2, $"D{GetActualRowNum(rowNum)}+E{GetActualRowNum(rowNum)}+F{GetActualRowNum(rowNum)}");
-            row.CreateCell(3, run.summary.Passed);
-            row.CreateCell(4, run.summary.NotExecuted);
-            row.CreateCell(5, run.summary.Failed);
-            var procentStyle = stylesBuilder.GetProcentStyle();
-            row.CreateCellWithFormula(6, $"D{GetActualRowNum(rowNum)}/C{GetActualRowNum(rowNum)}", procentStyle);
+            if (run.summary != null)
+            {
+                row.CreateCellWithFormula(2, $"D{GetActualRowNum(rowNum)}+E{GetActualRowNum(rowNum)}+F{GetActualRowNum(rowNum)}");
+                row.CreateCell(3, run.summary.Passed);
+                row.CreateCell(4, run.summary.NotExecuted);
+                row.CreateCell(5, run.summary.Failed);
+                var procentStyle = stylesBuilder.GetProcentStyle();
+                row.CreateCellWithFormula(6, $"D{GetActualRowNum(rowNum)}/C{GetActualRowNum(rowNum)}", procentStyle);
+            }
 
             return true;
         }
