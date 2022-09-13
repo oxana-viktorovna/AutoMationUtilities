@@ -27,27 +27,27 @@ namespace TestRuns.Utilities
         {
             failedUiSheet = book.CreateSheet("UI Failed");
             var headerRow = failedUiSheet.CreateRow(0);
-            var style = stylesBuilder.GetHeaderFullBorderStyle();
+            var style = stylesBuilder.GetHeaderBottomBorderStyle();
             headerRow.CreateCell(0, "N", style);
-            headerRow.CreateCell(4, "Reason", style);
-            headerRow.CreateCell(1, "TestCase N", style);
-            headerRow.CreateCell(2, "Test Method", style);
-            headerRow.CreateCell(3, "Error", style);
+            headerRow.CreateCell(1, "Reason", style);
+            headerRow.CreateCell(2, "TestCase N", style);
+            headerRow.CreateCell(3, "Test Method", style);
+            headerRow.CreateCell(4, "Error", style);
             
         }
 
         private void CreateFailedUiList(List<ResultReport> testResults)
         {
-            var style = stylesBuilder.GetRegularFullBorderStyle();
+            var style = stylesBuilder.GetRegularBottomBorderStyle();
             testResults = testResults.OrderBy(result => result.Reason).ThenBy(result => result.Error).ToList();
             for (int i = 0; i < testResults.Count; i++)
             {
                 var row = failedUiSheet.CreateRow(i + 1);
                 row.CreateCell(0, i + 1, style);
-                row.CreateCell(4, testResults[i].Reason, style);
-                row.CreateCell(1, Convert.ToInt32(testResults[i].TestCaseNumber), style);
-                row.CreateCell(2, testResults[i].TestMethodName, style);
-                row.CreateCell(3, testResults[i].Error, style);
+                row.CreateCell(1, testResults[i].Reason, style);
+                row.CreateCell(2, Convert.ToInt32(testResults[i].TestCaseNumber), style);
+                row.CreateCell(3, testResults[i].TestMethodName, style);
+                row.CreateCell(4, testResults[i].Error, style);
             }
         }
     }

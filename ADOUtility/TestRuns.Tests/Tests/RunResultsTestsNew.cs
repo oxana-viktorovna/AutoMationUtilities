@@ -49,7 +49,7 @@ namespace TestRuns
                 reRunsApiSummary.Add((rerunBuildId, reRunApiSummary));
             }
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
-            var currFileName = $"{currBuildNum}_New_{testSettings.CurrRunPostffix}";
+            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
 
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             var summaryReportBuilder = new RunNewSummaryBuilder(reportBuilder.Book);

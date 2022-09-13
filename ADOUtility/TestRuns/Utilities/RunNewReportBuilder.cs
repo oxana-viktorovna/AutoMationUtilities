@@ -15,7 +15,7 @@ namespace TestRuns.Utilities
         public IWorkbook Book { get; private set; }
         
         private const string XlsxFormat = ".xlsx";
-        private const string DefaultSummaryFileName = "TestResultSummary_";
+        private const string DefaultSummaryFileName = "Summary_";
         private readonly string saveFile;
 
         public void SaveReport()

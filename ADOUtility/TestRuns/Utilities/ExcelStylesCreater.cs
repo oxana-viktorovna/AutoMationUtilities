@@ -35,23 +35,23 @@ namespace TestRuns.Utilities
             return style;
         }
 
-        public XSSFCellStyle GetHeaderFullBorderStyle()
+        public XSSFCellStyle GetHeaderBottomBorderStyle()
         {
             var builder = new ExcelStyleBuilder(book);
-            var style = builder.AddFont(11, dfltFontName)
+            var style = builder.AddFont(10, dfltFontName)
                 .AddAlignmrnt(VerticalAlignment.Top, HorizontalAlignment.Center)
                 .AddForegroundColor(Color.LightGray, tint: 0.5)
-                .AddBorder(BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin)
+                .AddBorder(bottom: BorderStyle.Thin)
                 .Build();
 
             return style;
         }
 
-        public XSSFCellStyle GetRegularFullBorderStyle()
+        public XSSFCellStyle GetRegularBottomBorderStyle()
         {
             var builder = new ExcelStyleBuilder(book);
-            var style = builder.AddFont(11, dfltFontName)
-                .AddBorder(BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin)
+            var style = builder.AddFont(10, dfltFontName)
+                .AddBorder(bottom: BorderStyle.Thin)
                 .Build();
 
             return style;

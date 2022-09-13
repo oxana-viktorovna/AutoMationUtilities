@@ -25,7 +25,7 @@ namespace TestRuns.Utilities
         private void CreateFailedApiHeaders()
         {
             var headerRow = failedApiSheet.CreateRow(0);
-            var style = stylesBuilder.GetHeaderFullBorderStyle();
+            var style = stylesBuilder.GetHeaderBottomBorderStyle();
             headerRow.CreateCell(0, "N", style);
             headerRow.CreateCell(1, "API Name", style);
             headerRow.CreateCell(2, "Request", style);
@@ -35,7 +35,7 @@ namespace TestRuns.Utilities
 
         private void CreateFailedApiList(List<(string apiName, string request, string test)> testResults)
         {
-            var style = stylesBuilder.GetRegularFullBorderStyle();
+            var style = stylesBuilder.GetRegularBottomBorderStyle();
 
             for (int i = 0; i < testResults.Count; i++)
             {
