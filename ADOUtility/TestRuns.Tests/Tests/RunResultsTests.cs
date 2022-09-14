@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using TestRuns.Models;
 using TestRuns.Steps;
 using TestRuns.Utilities;
@@ -136,6 +137,7 @@ namespace TestRuns
             rerunString.Append("&(");
             foreach (var uiFailedTest in uiFailedTests)
             {
+                Regex.Replace(uiFailedTest.testName, @"\((.*?)\)", "");
                 rerunString.Append($"Name~{uiFailedTest.testName}|");
             }
             rerunString.Remove(rerunString.Length - 1, 1); // Remove last | symbol
