@@ -32,8 +32,8 @@ string GetFailedUiTests(int buildNumber)
     var adoSettings = new AdoSettings(adoSettingsReader);
     var apiSteps = new TestRunApiSteps(adoSettings);
 
-    var testResults = apiSteps.GetTrxAttachements(buildNumber, Outcome.Failed);
-    var uiFailedTests = testResults.GetFailedResults();
+    var testResults = apiSteps.GetTrxAttachements(buildNumber);
+    var uiFailedTests = testResults.GetAllRunResults();
 
     var rerunStr = new StringBuilder();
     rerunStr.Append("&(");
