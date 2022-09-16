@@ -65,7 +65,8 @@ namespace TestRuns
 
             var fullFailedTests = new List<ResultReport>();
             fullFailedTests.AddRange(ResultReportConverter.Convert(uiFailedTests));
-            fullFailedTests.AddRange(uiFailedBlockedTestsWithComments);
+            if(uiFailedBlockedTestsWithComments != null) 
+                fullFailedTests.AddRange(uiFailedBlockedTestsWithComments);
 
             var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
             var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
