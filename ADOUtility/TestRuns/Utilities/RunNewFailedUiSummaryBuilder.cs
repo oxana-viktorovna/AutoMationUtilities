@@ -19,7 +19,8 @@ namespace TestRuns.Utilities
         public void CreateFullFailedUiReport(List<ResultReport> failedResults, List<ResultReport> blockedBailedResults)
         {
             CreateFailedUiHeaders();
-            failedResults.AddRange(blockedBailedResults);
+            if(blockedBailedResults != null)
+                failedResults.AddRange(blockedBailedResults);
             CreateFailedUiList(failedResults);
         }
 
