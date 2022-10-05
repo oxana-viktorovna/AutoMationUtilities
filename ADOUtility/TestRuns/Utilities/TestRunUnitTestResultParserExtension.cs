@@ -87,13 +87,15 @@ namespace TestRuns.Utilities
 
             for (int i = 0; i < durationComparer.Count; i++)
             {
+                var symbol = DateTime.Compare(durationComparer[i].testResults.duration, durationComparer[i].preDuration)
+                    > 0 ? "+" : "-";
                 var diff = durationComparer[i].testResults.duration - durationComparer[i].preDuration;
                 csv.AppendLine(
                     durationComparer[i].testResults.testName.GetTestCaseNumber() + splitter +
                     durationComparer[i].testResults.testName.GetTestMethodName() + splitter +
                     durationComparer[i].testResults.duration.ToString("HH:mm:ss") + splitter +
                     durationComparer[i].preDuration.ToString("HH:mm:ss") + splitter +
-                    diff.ToString(@"mm\:ss")
+                    symbol+diff.ToString(@"mm\:ss")
                 ) ;
             }
 
