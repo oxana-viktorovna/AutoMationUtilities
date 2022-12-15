@@ -17,5 +17,15 @@ namespace ADOCore.Models
 
             return results;
         }
+
+        public static List<TestRunUnitTestResult> GetPassedOnReRunResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
+        {
+            var groups = allTestResults
+                .GroupBy(r => r.testName);
+            var passedOnReRunGroups = groups.Where(gr => gr.Where(r => r.outcome == "Passed").Any() && gr.Where(r => r.outcome == "Failed").Any());
+            var results = passedOnReRunGroups.Select(gr => gr.Where(r => r.outcome == "Failed").First()).ToList();
+
+            return results;
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace TestRuns.Utilities
                 var row = failedUiSheet.CreateRow(i + 1);
                 row.CreateCell(0, i + 1, style);
                 row.CreateCell(1, testResults[i].Reason, style);
-                row.CreateCell(2, Convert.ToInt32(testResults[i].TestCaseNumber), style);
+                row.CreateCell(2, Convert.ToInt32(string.IsNullOrEmpty(testResults[i].TestCaseNumber) ? "0" : testResults[i].TestCaseNumber), style);
                 row.CreateCell(3, testResults[i].TestMethodName, style);
                 row.CreateCell(4, testResults[i].Error, style);
             }

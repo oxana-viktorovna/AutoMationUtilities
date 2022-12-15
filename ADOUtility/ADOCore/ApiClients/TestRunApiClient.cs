@@ -29,6 +29,10 @@ namespace ADOCore.ApiClietns
         public RunStat GetRunStatistic(int runId)
         {
             var response = SendAdoRequest($"test/Runs/{runId}/Statistics", Method.GET);
+
+            if (response.Content.Contains("<!DOCTYPE html>"))
+                return null;
+
             var runStat = JsonSerializer.Deserialize<RunStat>(response.Content);
 
             return runStat;

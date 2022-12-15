@@ -54,6 +54,17 @@ namespace TestRuns
         }
 
         [TestMethod]
+        public void GetPassedOnReRunUiRunResultsByBuild()
+        {
+            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(testSettings.CurrBuildId, blockedPattern);
+            var uiPassedOnReRunTests = allTestResultsExcludeBlocked.GetPassedOnReRunResults();
+
+            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
+            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
+            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, ResultReportConverter.Convert(uiPassedOnReRunTests));
+        }
+
+            [TestMethod]
         public void GetFailedUiRunResultsByBuild()
         {
             var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(testSettings.CurrBuildId, blockedPattern);

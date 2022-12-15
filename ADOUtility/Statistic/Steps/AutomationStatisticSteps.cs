@@ -62,7 +62,6 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
-                .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "<>")
                 .AddSinglePriorityCondition(priority, "=")
                 .AddAsOf(asOf)
                 .Build();
@@ -76,7 +75,6 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
-                .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "<>")
                 .AddInPriorityCondition(priorities)
                 .AddAsOf(asOf)
                 .Build();
