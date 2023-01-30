@@ -57,6 +57,13 @@ namespace TestRuns.Steps
             return $"{envs}-{buildNameHelpers[0].Browser}-{buildDate}";
         }
 
+        public string GetFullBuildName(List<int> buildIds)
+        {
+            var buildsData = buildIds.Select(buildId => buildsApiClient.GetBuild(buildId)).ToList();
+
+            return buildsData.First().buildNumber;
+        }
+
         public string GetBuildEnv(int buildId)
         {
             var buildData = buildsApiClient.GetBuild(buildId);
