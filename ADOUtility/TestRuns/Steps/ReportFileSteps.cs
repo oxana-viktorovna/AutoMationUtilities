@@ -11,16 +11,6 @@ namespace TestRuns.Steps
         private const string DefaultUiFileName = "FailedUITests_";
         private const string DefaultApiFileName = "FailedAPITests_";
 
-        public void SaveUiResults(string filePath, string fileName, IEnumerable<TestRunUnitTestResult> testResults, bool isFailed = true)
-        {
-            var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
-            if (isFailed)
-                testResults = testResults.OrderBy(result => result.Output.ErrorInfo.Message);
-
-            var fileContent = testResults.ToList().ToCsvFormat(csvWorker.Splitter);
-            csvWorker.Write(fileContent);
-        }
-
         public void SaveUiResults(string filePath, string fileName, IEnumerable<ResultReport> testResults)
         {
             var csvWorker = new CsvWorker(Path.Combine(filePath, DefaultUiFileName + fileName + CsvFormat));
@@ -65,23 +55,7 @@ namespace TestRuns.Steps
             csvWorker.Write(fileContent);
         }
 
-        public void SaveOutcomes(string filePath, string runTitle, IEnumerable<OutcomeResult> outcomes)
-        {
-            var csvWorker = new CsvWorker(Path.Combine(filePath, runTitle + CsvFormat));
-            var orderedOutcomes = outcomes.OrderBy(outcome => outcome.TestId).ToList();
-
-            var fileContent = orderedOutcomes.ToCsvFormat(csvWorker.Splitter);
-            csvWorker.Write(fileContent);
-        }
-
-        public void SaveResultReport(string filePath, string runTitle, IEnumerable<ResultReport> resultReports)
-        {
-            var csvWorker = new CsvWorker(Path.Combine(filePath, runTitle + CsvFormat));
-            var fileContent = resultReports.ToCsvFormat(csvWorker.Splitter);
-            csvWorker.Write(fileContent);
-        }
-
-        public List<ResultReport> ReadUiReportResult(string filePath, string runTitle)
+        public List<ResultReport>? ReadUiReportResult(string filePath, string runTitle)
         {
             var csvWorker = new CsvWorker(Path.Combine(filePath, runTitle + CsvFormat));
             try
@@ -98,18 +72,6 @@ namespace TestRuns.Steps
 
         }
 
-        public void CompareResultsWithPrevious(string filePath, string preFileName, string currFileName)
-        {
-            var previousResults = ReadUiReportResult(filePath, DefaultUiFileName + preFileName);
-            if (previousResults == null)
-                return;
-
-            var currentResults = ReadUiReportResult(filePath, DefaultUiFileName + currFileName);
-            var currentResultsWithComments = ResultReportComparer.CopyComments(currentResults, previousResults);
-
-            SaveResultReport(filePath, DefaultUiFileName + currFileName, currentResultsWithComments);
-        }
-
         public List<ResultReport> CompareResultsWithBlockers(string filePath, string preFileName, List<ResultReport> currResults)
         {
             var previousResults = ReadUiReportResult(filePath, preFileName);
@@ -117,18 +79,6 @@ namespace TestRuns.Steps
                 return currResults;
 
             return ResultReportComparer.CopyBlockedComments(currResults, previousResults);
-        }
-
-        public void CompareResultsWithPreviousIgnoreError(string filePath, string preBuildNum, string currBuildNum)
-        {
-            var previousResults = ReadUiReportResult(filePath, DefaultUiFileName + preBuildNum);
-            if (previousResults == null)
-                return;
-
-            var currentResults = ReadUiReportResult(filePath, DefaultUiFileName + currBuildNum);
-            var currentResultsWithComments = ResultReportComparer.CopyCommentsIgnoreError(currentResults, previousResults);
-
-            SaveResultReport(filePath, DefaultUiFileName + currBuildNum, currentResultsWithComments);
         }
     }
 }

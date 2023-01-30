@@ -9,7 +9,9 @@ namespace TestRuns.Models
             string reason,
             string testcase, 
             string testMethod, 
-            string error 
+            string error,
+            string runName="",
+            string buildName = ""
             )
         {
             Number = num;
@@ -17,13 +19,17 @@ namespace TestRuns.Models
             TestMethodName = testMethod;
             Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
             Reason = reason;
+            RunName = runName;
+            BuildName = buildName;
         }
 
         public ResultReport(
             string reason,
             string testcase,
             string testMethod,
-            string error
+            string error,
+            string runName="",
+            string buildName = ""
             )
         {
             Number = 0;
@@ -31,6 +37,8 @@ namespace TestRuns.Models
             TestMethodName = testMethod;
             Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
             Reason = reason;
+            RunName = runName;
+            BuildName = buildName;
         }
 
         public int Number { get; set; }
@@ -38,6 +46,8 @@ namespace TestRuns.Models
         public string TestMethodName { get; set; }
         public string Error { get; set; }
         public string Reason { get; set; }
+        public string RunName { get; set; }
+        public string BuildName { get; set; }
     }
 
     public static class ResultReportExtension

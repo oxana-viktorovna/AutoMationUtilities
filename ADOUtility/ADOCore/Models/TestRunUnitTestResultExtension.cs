@@ -27,5 +27,8 @@ namespace ADOCore.Models
 
             return results;
         }
+
+        public static List<TestRunUnitTestResult> ExcludeBlocked(this IEnumerable<TestRunUnitTestResult> allTestResults)
+            => allTestResults.Where(r => !r.RunName.Contains("Block")).ToList();
     }
 }

@@ -11,6 +11,7 @@ namespace TestRuns
             SaveFolder = reader.GetSetting("saveFolder");
             CurrBuildId = GetIntSetting(reader, "currentTestRun:buildId");
             Reruns = reader.GetSettingArray<int>("currentTestRun:RerunBuildIds");
+            CurrBuildIds = reader.GetSettingArray<int>("currentTestRun:buildIds");
             RunDuration = reader.GetSetting("currentTestRun:runDuration");
             PreviousBuildId = GetIntSetting(reader, "previousTestRun:buildId");
             CurrRunPostffix = GetPostfix(reader,"currentTestRun:runPostffix");
@@ -20,6 +21,7 @@ namespace TestRuns
         public string SaveFolder { get; private set; }
         public int CurrBuildId { get; private set; }
         public List<int> Reruns { get; private set; }
+        public List<int> CurrBuildIds { get; private set; }
         public string RunDuration { get; private set; }
         public int PreviousBuildId { get; private set; }
         public string CurrRunPostffix { get; private set; }

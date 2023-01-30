@@ -345,6 +345,10 @@
 
         private string relativeResultsDirectoryField;
 
+        public string Env { get; set; }
+
+        public string RunName { get; set; }
+
         /// <remarks/>
         public TestRunUnitTestResultOutput Output
         {

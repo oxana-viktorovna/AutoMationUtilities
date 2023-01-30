@@ -38,7 +38,8 @@ namespace TestRuns.Utilities
         public static List<Runstatistic> GetOutcomeStat(this IEnumerable<RunStat> runStats)
         {
             var runstatistic = runStats.SelectMany(rst => rst.runStatistics);
-            var statistic = runstatistic.GroupBy(stat => stat.outcome).Select(gstat =>
+            var statistic = runstatistic.GroupBy(stat => stat.outcome)
+                .Select(gstat =>
             {
                 var totalCount = gstat.Sum(st => st.count);
                 return new Runstatistic()

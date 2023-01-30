@@ -3,8 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using Statistic.Settings;
 using Statistic.Steps;
-using Statistic.Utilities;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Statistic
 {
@@ -35,10 +36,8 @@ namespace Statistic
                 ("2+", autoStatSteps.GetAutomatedTestCountByPriority(otherPriorities), autoStatSteps.GetTestCountByPriority(otherPriorities))
             };
 
-            var readPath = PathResolver.GetReadPath(autoStatSettings.FirstTimeRun, autoStatSettings.SaveFolder);
-            var savePath = PathResolver.GetSavePath(autoStatSettings.SaveFolder);
-            var excel = new ExcelAutoStatWorker(readPath);
-            excel.PopulateAutoStat(savePath, rawStat, autoStatSettings.AsOf);
+            Assert.Inconclusive(Environment.NewLine + string.Join(Environment.NewLine,rawStat.Select(stat => $"priority {stat.priority} automated {stat.autoCount} all test cases {stat.allCount}")));
+
         }
     }
 }

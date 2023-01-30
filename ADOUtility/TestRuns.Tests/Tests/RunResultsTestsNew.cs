@@ -3,6 +3,7 @@ using ADOCore.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using System.Collections.Generic;
+using System.Linq;
 using TestRuns.Models;
 using TestRuns.Steps;
 using TestRuns.Utilities;
@@ -21,6 +22,8 @@ namespace TestRuns
             var testSettingsReader = new SettingsReader("TestRunTestConfig.json");
             testSettings = new TestRunTestSettings(testSettingsReader);
             apiSteps = new TestRunApiSteps(adoSettings);
+            apiStepsNew = new TestRunApiStepsNew(adoSettings);
+            buildApiSteps = new BuildApiSteps(adoSettings);
 
             blockedPattern = "[b|B]locked";
         }
@@ -28,12 +31,14 @@ namespace TestRuns
         private AdoSettings adoSettings;
         private TestRunTestSettings testSettings;
         private TestRunApiSteps apiSteps;
+        private TestRunApiStepsNew apiStepsNew;
+        private BuildApiSteps buildApiSteps;
         private string blockedPattern;
 
         [TestMethod]
         public void CreateFullRunReport()
         {           
-            var allBuildIds = apiSteps.GetAllBuildsIds(testSettings.CurrBuildId, testSettings.Reruns);
+            var allBuildIds = buildApiSteps.GetAllBuildsIds(testSettings.CurrBuildId, testSettings.Reruns);
             var mainStatistic = apiSteps.GetRunStatistics(testSettings.CurrBuildId);
             var uiSummary = mainStatistic.GetUiStatistic();
             var apiSummary = mainStatistic.GetApiStatistic();
@@ -48,8 +53,8 @@ namespace TestRuns
                 var reRunApiSummary = reRunStatistic.GetApiStatistic();
                 reRunsApiSummary.Add((rerunBuildId, reRunApiSummary));
             }
-            var currBuildNum = apiSteps.GetBuildNumber(testSettings.CurrBuildId);
-            var currFileName = $"{currBuildNum}{testSettings.CurrRunPostffix}";
+            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildId);
+            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
 
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             var summaryReportBuilder = new RunNewSummaryBuilder(reportBuilder.Book);
@@ -63,21 +68,66 @@ namespace TestRuns
 
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
 
-            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(allBuildIds, blockedPattern);
-            var uiFailedTests = allTestResultsExcludeBlocked.GetFailedResults();
+            var allTestResultsNonBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(allBuildIds, blockedPattern);
+            var uiFailedTests = allTestResultsNonBlocked.GetFailedResults();
 
-            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildId, blockedPattern);
+            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildIds, blockedPattern);
             var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
             var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
 
             uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(uiFailedTests), uiFailedBlockedTestsWithComments);
 
             var apiReportBuilder = new RunNewApiSummaryBuilder(reportBuilder.Book);
-            var apiTestResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildId, testSettings.Reruns);
+            var apiTestResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildIds, testSettings.Reruns);
             var apiFailedResults = apiTestResults.GetFailedTests();
             apiReportBuilder.CreateFullFailedApiReport(apiFailedResults);
 
             reportBuilder.SaveReport();           
+        }
+
+        [TestMethod]
+        public void CreateFullRunReportNew()
+        {
+            #region Get Run Summary
+
+            var origRunBuilds = testSettings.CurrBuildIds.Select(build => (build, true));
+            var reRunBuilds = testSettings.Reruns.Select(build => (build, false));
+            var statistic = apiStepsNew.GetRunSummaryStat(origRunBuilds, reRunBuilds);
+            statistic.Add((TestType.Script, (testSettings.CurrBuildIds[0], true), new RunSummary() { Passed = 1}));
+
+
+            #endregion Get Run Summary
+
+            #region Generate Report Summary
+
+            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
+            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
+            var summaryReportBuilder = new RunNewSummaryBuilderNew(reportBuilder.Book, buildApiSteps);
+            summaryReportBuilder.CreateSummaryReport(statistic, testSettings.RunDuration);
+
+            #endregion Generate Report Summary
+            
+            #region Generate Failed Report
+
+            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
+
+            var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
+            var uiFailedTests = allTestResults.GetFailedResults();
+
+            var uiFailedTestsWithComments = apiStepsNew.CopyCommentsForBlocked(uiFailedTests, testSettings.SaveFolder);
+
+            uiReportBuilder.CreateFullFailedUiReport(uiFailedTestsWithComments);
+            /*
+            var apiReportBuilder = new RunNewApiSummaryBuilder(reportBuilder.Book);
+            var apiTestResults = apiStepsNew.GetJUnitAttachements(testSettings.CurrBuildIds, testSettings.Reruns);
+            var apiFailedResults = apiTestResults.GetFailedTests();
+            apiReportBuilder.CreateFullFailedApiReport(apiFailedResults);
+            */
+            #endregion Generate Failed Report
+            
+            reportBuilder.SaveReport();
+
         }
     }
 }

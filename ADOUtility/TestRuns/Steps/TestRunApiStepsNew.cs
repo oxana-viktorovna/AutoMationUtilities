@@ -8,9 +8,9 @@ using TestRuns.Utilities;
 
 namespace TestRuns.Steps
 {
-    public class TestRunApiSteps
+    public class TestRunApiStepsNew
     {
-        public TestRunApiSteps(AdoSettings adoSettings)
+        public TestRunApiStepsNew(AdoSettings adoSettings)
         {
             testRunApiClient = new TestRunApiClient(adoSettings);
             testResultDetailApiClient = new ResultDetailsByBuildApiClient(adoSettings);
@@ -20,6 +20,8 @@ namespace TestRuns.Steps
         private readonly TestRunApiClient testRunApiClient;
         private readonly ResultDetailsByBuildApiClient testResultDetailApiClient;
         private readonly BuildApiSteps buildApiSteps;
+
+        #region Run Summary
 
         public List<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)> GetRunSummaryStat(params IEnumerable<(int id, bool isOrig)>[] builds)
         {
@@ -52,12 +54,7 @@ namespace TestRuns.Steps
             return stat;
         }
 
-        public List<RunStat> GetRunStatistics(int buildId)
-        {
-            var runIds = testResultDetailApiClient.GetRunIds(buildId);
-
-            return testRunApiClient.GetRunStatistic(runIds);
-        }
+        #endregion Run Summary
 
         #region Trx
 
@@ -141,12 +138,12 @@ namespace TestRuns.Steps
             return GetTxrAttachments(allAtchsInfos);
         }
 
-        public List<ResultReport> CopyCommentsForBlocked(IEnumerable<TestRunUnitTestResult> blockedTests, string saveFolder)
+        public List<ResultReport> CopyCommentsForBlocked(List<TestRunUnitTestResult> testRunResults, string saveFolder)
         {
-            if (!blockedTests.Any())
+            if (!testRunResults.Any())
                 return null;
 
-            var uiFailedBlockedTests = ResultReportConverter.Convert(blockedTests.GetFailedResults());
+            var uiFailedBlockedTests = ResultReportConverter.Convert(testRunResults);
             var uiFailedBlockedTestsWithComments = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blockers", uiFailedBlockedTests);
 
             return uiFailedBlockedTestsWithComments;
@@ -200,6 +197,57 @@ namespace TestRuns.Steps
             return runIds;
         }
 
+        public List<TestRunUnitTestResult> GetTrxAttachments(params List<int>[] buildsIds)
+        {
+            var allBuildIds = new List<int>();
+            foreach (var buildIds in buildsIds)
+            {
+                allBuildIds.AddRange(buildIds);
+            }
+
+            return allBuildIds.SelectMany(buildId => GetTrxAttachments(buildId)).ToList();
+        }
+
+        public List<TestRunUnitTestResult> GetTrxAttachments(int buildId)
+        {
+
+            var buildName = buildApiSteps.GetBuildEnv(buildId);
+            var runInfos = GetRunInfo(buildId);
+            var runAttchmentsInfos = GetRunAttchmentsInfo(runInfos);
+            var runAttchmentsIds = GetAttchsIdsByType(runAttchmentsInfos, ".trx");
+            var testRunTrxAttachments = GetTestRunTrxAttachments(runAttchmentsIds);
+            var testRunResults = testRunTrxAttachments.SelectMany(trx => {
+                var results = trx.testRunAttach.Results;
+                foreach (var result in results)
+                {
+                    result.RunName = trx.runName;
+                    result.Env = buildName;
+                }
+
+                return results;
+            });
+
+            return testRunResults.ToList();
+        }
+
+        private List<(string runName,TestRun testRunAttach)> GetTestRunTrxAttachments(IEnumerable<(RunInfo runInfo, int attchId)> ids)
+            => ids.Select(rId => (rId.runInfo.name, testRunApiClient.GetTrxResults(rId.runInfo.id, rId.attchId))).ToList();
+
+        private List<(RunInfo runInfo, AttachmentsInfo attchInfos)> GetRunAttchmentsInfo(List<RunInfo> runInfos)
+            => runInfos.Select(runInfo => (runInfo, testRunApiClient.GetAttachmentsInfo(runInfo.id))).ToList();
+
+        private List<RunInfo> GetRunInfo(params List<int>[] buildsIds)
+            => buildsIds.SelectMany(buildsId => buildsId.SelectMany(buildId => GetRunInfo(buildId))).ToList();
+
+        private List<RunInfo> GetRunInfo(int buildId)
+        {
+            var runIds = testResultDetailApiClient.GetRunIds(buildId);
+            var runInfos = testRunApiClient.GetRunInfo(runIds);
+
+            return runInfos;
+
+        }
+
         #endregion Trx
 
         #region JUnit
@@ -244,6 +292,21 @@ namespace TestRuns.Steps
             => ids.Select(raId => testRunApiClient.GetJUnitReport(raId.runId, raId.attchId)).ToList();
 
         #endregion JUnit
+
+        private static List<(RunInfo runInfo, int attchId)> GetAttchsIdsByType(IEnumerable<(RunInfo runInfo, AttachmentsInfo attchInfos)> runAttchInfos, string type)
+        {
+            var ids = new List<(RunInfo, int)>();
+            foreach (var (runInfo, attchInfos) in runAttchInfos)
+            {
+                foreach (var attchInfo in attchInfos.value)
+                {
+                    if (attchInfo.fileName.Contains(type))
+                        ids.Add((runInfo, attchInfo.id));
+                }
+            }
+
+            return ids;
+        }
 
         private static List<(int runId, int attchId)> GetLastAttchsIdsByType(IEnumerable<(int runId, AttachmentsInfo attchInfos)> runAttchInfos, string type)
         {

@@ -26,14 +26,21 @@ namespace TestRuns.Utilities
                 );
         }
 
-        public static List<ResultReport> Convert( List<TestRunUnitTestResult> results)
+        public static List<ResultReport> Convert(List<TestRunUnitTestResult> results)
         {
             var resultReports = new List<ResultReport>();
 
             for (int i = 0; i < results.Count; i++)
             {
                 var testName = results[i].testName.GetTestMethodName();
-                var resultReport = new ResultReport(i + 1, "", results[i].testName.GetTestCaseNumber(), testName, results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "));
+                var resultReport = new ResultReport(
+                    i + 1, 
+                    "", 
+                    results[i].testName.GetTestCaseNumber(), 
+                    testName, 
+                    results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "),
+                    results[i].RunName,
+                    results[i].Env);
 
                 resultReports.Add(resultReport);
             }

@@ -16,6 +16,12 @@ namespace TestRuns.Utilities
         private readonly IWorkbook book;
         private readonly ExcelStylesCreater stylesBuilder;
 
+        public void CreateFullFailedUiReport(List<ResultReport> failedResults)
+        {
+            CreateFailedUiHeaders();
+            CreateFailedUiList(failedResults);
+        }
+
         public void CreateFullFailedUiReport(List<ResultReport> failedResults, List<ResultReport> blockedBailedResults)
         {
             CreateFailedUiHeaders();
@@ -34,7 +40,8 @@ namespace TestRuns.Utilities
             headerRow.CreateCell(2, "TestCase N", style);
             headerRow.CreateCell(3, "Test Method", style);
             headerRow.CreateCell(4, "Error", style);
-            
+            headerRow.CreateCell(5, "Run Name", style);
+            headerRow.CreateCell(6, "Env", style);
         }
 
         private void CreateFailedUiList(List<ResultReport> testResults)
@@ -43,12 +50,17 @@ namespace TestRuns.Utilities
             testResults = testResults.OrderBy(result => result.Reason).ThenBy(result => result.Error).ToList();
             for (int i = 0; i < testResults.Count; i++)
             {
+                var runName = testResults[i].RunName.Contains("ATDD_BVTPriority0") ? "ATDD_BVTPriority0" : testResults[i].RunName.Split('_')[1];
+                runName = testResults[i].RunName.Contains("Block") ? runName + "BLOCK": runName;
+
                 var row = failedUiSheet.CreateRow(i + 1);
                 row.CreateCell(0, i + 1, style);
                 row.CreateCell(1, testResults[i].Reason, style);
                 row.CreateCell(2, Convert.ToInt32(string.IsNullOrEmpty(testResults[i].TestCaseNumber) ? "0" : testResults[i].TestCaseNumber), style);
                 row.CreateCell(3, testResults[i].TestMethodName, style);
                 row.CreateCell(4, testResults[i].Error, style);
+                row.CreateCell(5, runName, style);
+                row.CreateCell(6, testResults[i].BuildName, style);
             }
         }
     }

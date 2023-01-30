@@ -8,14 +8,15 @@ namespace TestRuns.Utilities
     {
         public RunNewReportBuilder(string pathToSave, string fileName)
         {
-            saveFile = Path.Combine(pathToSave, DefaultSummaryFileName + fileName + XlsxFormat);
-            Book = new XSSFWorkbook();         
+            saveFile = Path.Combine(pathToSave, DfltFileName + fileName + XlsxFormat);
+            Book = new XSSFWorkbook();
+            DfltFileName = "Summary_";
         }
 
         public IWorkbook Book { get; private set; }
         
         private const string XlsxFormat = ".xlsx";
-        private const string DefaultSummaryFileName = "Summary_";
+        public string DfltFileName { get; set; }
         private readonly string saveFile;
 
         public void SaveReport()
