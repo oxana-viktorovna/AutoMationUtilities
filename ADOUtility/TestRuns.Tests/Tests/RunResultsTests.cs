@@ -71,7 +71,7 @@ namespace TestRuns
         [TestMethod]
         public void GetFailedUiRunResultsByBuild()
         {
-            var shortBuildName = buildApiSteps.GetFullBuildName(testSettings.CurrBuildIds);
+            var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
             var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             reportBuilder.DfltFileName = "FailedUI";

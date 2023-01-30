@@ -47,6 +47,14 @@ namespace TestRuns.Steps
             return $"{buildNameHelper.Env}-{buildNameHelper.Browser}-{buildDate}";
         }
 
+        public string GetBuildName(List<int> buildIds)
+        {
+            if (buildIds.Count == 1)
+                return GetFullBuildName(buildIds[0]);
+            else
+                return GetShortBuildName(buildIds);
+        }
+
         public string GetShortBuildName(List<int> buildIds)
         {
             var buildsData = buildIds.Select(buildId => buildsApiClient.GetBuild(buildId)).ToList();
@@ -57,11 +65,11 @@ namespace TestRuns.Steps
             return $"{envs}-{buildNameHelpers[0].Browser}-{buildDate}";
         }
 
-        public string GetFullBuildName(List<int> buildIds)
+        public string GetFullBuildName(int buildId)
         {
-            var buildsData = buildIds.Select(buildId => buildsApiClient.GetBuild(buildId)).ToList();
+            var buildsData = buildsApiClient.GetBuild(buildId);
 
-            return buildsData.First().buildNumber;
+            return buildsData.buildNumber;
         }
 
         public string GetBuildEnv(int buildId)
