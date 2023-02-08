@@ -35,7 +35,7 @@ namespace TestRuns
         private BuildApiSteps buildApiSteps;
         private string blockedPattern;
 
-        [TestMethod]
+
         public void CreateFullRunReport()
         {           
             var allBuildIds = buildApiSteps.GetAllBuildsIds(testSettings.CurrBuildId, testSettings.Reruns);
@@ -101,7 +101,7 @@ namespace TestRuns
             #region Generate Report Summary
 
             var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+            var currFileName = $"Summary_{shortBuildName}{testSettings.CurrRunPostffix}";
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             var summaryReportBuilder = new RunNewSummaryBuilderNew(reportBuilder.Book, buildApiSteps);
             summaryReportBuilder.CreateSummaryReport(statistic, testSettings.RunDuration);

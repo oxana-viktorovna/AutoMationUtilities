@@ -43,7 +43,13 @@ namespace TestRuns
         [TestMethod]
         public void GetAllUiTestResultsByBuildId()
         {
-            var allTestResults = apiSteps.GetAllTrxRunResults(testSettings.CurrBuildIds);
+            var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
+            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
+            reportBuilder.DfltFileName = "AllUI";
+            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
+
+            var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
             var uiPassedTests = allTestResults.GetPassedResults();
             var uiFailedTests = allTestResults.GetFailedResults();
 
@@ -51,21 +57,27 @@ namespace TestRuns
             allSelectedTestResults.AddRange(uiPassedTests);
             allSelectedTestResults.AddRange(uiFailedTests);
 
-            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(allSelectedTestResults));
 
-            fileSteps.SaveAllUiResults(testSettings.SaveFolder, currFileName, allSelectedTestResults);
+            reportBuilder.SaveReport();
         }
 
         [TestMethod]
         public void GetPassedOnReRunUiRunResultsByBuild()
         {
-            var allTestResultsExcludeBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(testSettings.CurrBuildIds, blockedPattern);
-            var uiPassedOnReRunTests = allTestResultsExcludeBlocked.GetPassedOnReRunResults();
-
-            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
+            var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
             var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, ResultReportConverter.Convert(uiPassedOnReRunTests));
+
+            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
+            reportBuilder.DfltFileName = "PassedOnrerun";
+            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
+
+            var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
+            var uiPassedOnReRunTests = allTestResults.GetPassedOnReRunResults();
+
+            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(uiPassedOnReRunTests));
+
+            reportBuilder.SaveReport();
         }
 
         [TestMethod]
@@ -73,8 +85,9 @@ namespace TestRuns
         {
             var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
             var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
-            reportBuilder.DfltFileName = "FailedUI";
+            reportBuilder.DfltFileName = "Failed_UI_";
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
 
             var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
@@ -108,37 +121,13 @@ namespace TestRuns
         }
 
         [TestMethod]
-        public void GetFailedUiBlockedRunResults()
-        {
-            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildIds, blockedPattern);
-            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
-            var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
-
-            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}_FailedBlocked";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiFailedBlockedTestsWithComments);
-        }
-
-        [TestMethod]
-        public void GetPassedUiBlockedRunResults()
-        {
-            var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildIds, blockedPattern);
-            var uiPassedBlockedTests = allTestResultsIncludeBlocked.GetPassedResults();
-            var uiPassedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiPassedBlockedTests, testSettings.SaveFolder);
-
-            var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}_PassedBlocked";
-            fileSteps.SaveUiResults(testSettings.SaveFolder, currFileName, uiPassedBlockedTestsWithComments);
-        }
-
-        [TestMethod]
         public void GetFailedApiRunResults()
         {
             var testResults = apiSteps.GetJUnitAttachements(testSettings.CurrBuildIds);
             var failedResults = testResults.GetFailedTests();
 
             var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            fileSteps.SaveApiFailedResults(testSettings.SaveFolder, shortBuildName, failedResults);
+            fileSteps.SaveApiFailedResults(testSettings.SaveFolder, "Failed_API_"+shortBuildName, failedResults);
         }
 
         [TestMethod]
@@ -156,8 +145,8 @@ namespace TestRuns
                 rerunString.Append("&(");
                 foreach (var test in envGroup)
                 {
-                    Regex.Replace(test.testName, @"\((.*?)\)", "");
-                    rerunString.Append($"Name~{test.testName}|");
+                    var testName = Regex.Replace(test.testName, @"\((.*?)\)", "");
+                    rerunString.Append($"Name~{testName}|");
                 }
                 rerunString.Remove(rerunString.Length - 1, 1); // Remove last | symbol
                 rerunString.Append(')');
@@ -169,7 +158,7 @@ namespace TestRuns
             Assert.Inconclusive(string.Join(Environment.NewLine, rerunStrings));
         }
 
-        [TestMethod]
+        [TestMethod] //TODO Update
         public void GetUiRunDurationCompare()
         {
             var currAllTestResults = apiSteps.GetAllTrxRunResults(testSettings.CurrBuildId);

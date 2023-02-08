@@ -33,12 +33,13 @@ namespace TestRuns.Utilities
             for (int i = 0; i < results.Count; i++)
             {
                 var testName = results[i].testName.GetTestMethodName();
+                var error = results[i].Output.ErrorInfo == null ? "Passed" : results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". ");
                 var resultReport = new ResultReport(
                     i + 1, 
                     "", 
                     results[i].testName.GetTestCaseNumber(), 
-                    testName, 
-                    results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". "),
+                    testName,
+                    error,
                     results[i].RunName,
                     results[i].Env);
 

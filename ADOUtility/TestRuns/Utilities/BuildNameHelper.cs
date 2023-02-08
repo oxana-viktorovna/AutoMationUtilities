@@ -7,6 +7,7 @@
             this.buildName = buildName;
             environmets = new List<string>()
             {
+                "lzhighlander",
                 "lzushammers",
                 "lzushammers2",
                 "lzusstaging",
