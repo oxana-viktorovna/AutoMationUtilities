@@ -44,7 +44,7 @@ namespace TestRuns
         public void GetAllUiTestResultsByBuildId()
         {
             var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}";
+            var currFileName = $"All_UI_{shortBuildName}{testSettings.CurrRunPostffix}";
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             reportBuilder.DfltFileName = "AllUI";
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);

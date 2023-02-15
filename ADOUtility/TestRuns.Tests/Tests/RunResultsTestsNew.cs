@@ -101,7 +101,7 @@ namespace TestRuns
             #region Generate Report Summary
 
             var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"Summary_{shortBuildName}{testSettings.CurrRunPostffix}";
+            var currFileName = $"Full_{shortBuildName}{testSettings.CurrRunPostffix}";
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             var summaryReportBuilder = new RunNewSummaryBuilderNew(reportBuilder.Book, buildApiSteps);
             summaryReportBuilder.CreateSummaryReport(statistic, testSettings.RunDuration);
