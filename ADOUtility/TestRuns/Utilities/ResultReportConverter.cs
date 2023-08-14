@@ -19,9 +19,9 @@ namespace TestRuns.Utilities
                 ? data[4].TrimStart('"').TrimEnd('"')
                 : String.Empty;
             return new ResultReport(
+                data[0],
                 data[1],
                 data[2],
-                data[3],
                 error
                 );
         }

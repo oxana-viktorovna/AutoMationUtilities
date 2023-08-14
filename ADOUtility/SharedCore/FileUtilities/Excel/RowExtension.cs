@@ -27,6 +27,8 @@ namespace SharedCore.FileUtilities.Excel
         public static void CreateCell(this IRow row, int column, string value, ICellStyle style = null)
         {
             ICell cell = row.CreateCell(column);
+            if (value != null && value.Length >= 32767)
+                value = value.Substring(0, 32767);
             cell.SetCellValue(value);
 
             if(style!=null)
