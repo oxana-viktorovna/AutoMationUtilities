@@ -216,18 +216,18 @@ namespace TestRuns.Steps
             var runAttchmentsInfos = GetRunAttchmentsInfo(runInfos);
             var runAttchmentsIds = GetAttchsIdsByType(runAttchmentsInfos, ".trx");
             var testRunTrxAttachments = GetTestRunTrxAttachments(runAttchmentsIds);
-            var testRunResults = testRunTrxAttachments.SelectMany(trx => {
+            var testRunResults = testRunTrxAttachments.Where(trx => trx.testRunAttach.Results != null).SelectMany(trx => {
                 var results = trx.testRunAttach.Results;
-                foreach (var result in results)
-                {
-                    result.RunName = trx.runName;
-                    result.Env = buildName;
-                }
+                 foreach (var result in results)
+                    {
+                        result.RunName = trx.runName;
+                        result.Env = buildName;
+                    }
 
                 return results;
             });
 
-            return testRunResults.ToList();
+            return testRunResults == null ? null : testRunResults.ToList();
         }
 
         private List<(string runName,TestRun testRunAttach)> GetTestRunTrxAttachments(IEnumerable<(RunInfo runInfo, int attchId)> ids)
