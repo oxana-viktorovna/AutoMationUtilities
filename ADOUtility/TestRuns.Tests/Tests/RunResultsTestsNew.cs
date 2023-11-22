@@ -69,10 +69,10 @@ namespace TestRuns
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
 
             var allTestResultsNonBlocked = apiSteps.GetAllTrxRunResultsExcludeRun(allBuildIds, blockedPattern);
-            var uiFailedTests = allTestResultsNonBlocked.GetFailedResults();
+            var uiFailedTests = allTestResultsNonBlocked.GetNotPassedResults();
 
             var allTestResultsIncludeBlocked = apiSteps.GetAllTrxRunResultsIncludeRun(testSettings.CurrBuildIds, blockedPattern);
-            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetFailedResults();
+            var uiFailedBlockedTests = allTestResultsIncludeBlocked.GetNotPassedResults();
             var uiFailedBlockedTestsWithComments = apiSteps.CopyCommentsForBlocked(uiFailedBlockedTests, testSettings.SaveFolder);
 
             uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(uiFailedTests), uiFailedBlockedTestsWithComments);
@@ -113,7 +113,7 @@ namespace TestRuns
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
 
             var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
-            var uiFailedTests = allTestResults.GetFailedResults();
+            var uiFailedTests = allTestResults.GetNotPassedResults();
 
             var uiFailedTestsWithComments = apiStepsNew.CopyCommentsForBlocked(uiFailedTests, testSettings.SaveFolder);
 

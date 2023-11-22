@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -20,9 +21,16 @@ namespace SharedCore.FileUtilities
             var serializer = new XmlSerializer(typeof(T));
             using (var reader = new MemoryStream(Encoding.UTF8.GetBytes(input)))
             {
-                var runResult = serializer.Deserialize(reader);
+                try
+                {
+                    var runResult = serializer.Deserialize(reader);
 
-                return (T)runResult;
+                    return (T)runResult;
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return default;
+                }
             }
         }
 

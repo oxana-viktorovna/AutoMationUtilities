@@ -15,13 +15,15 @@ namespace TestRuns.Utilities
 
         public static ResultReport Convert(string[] data)
         {
-            var error = data.Count() == 5 
-                ? data[4].TrimStart('"').TrimEnd('"')
+            var error = data.Count() == 6 
+                ? data[5].TrimStart('"').TrimEnd('"')
                 : String.Empty;
             return new ResultReport(
-                data[0],
+                System.Convert.ToInt32(data[0]),
                 data[1],
                 data[2],
+                data[3],
+                data[4],
                 error
                 );
         }
@@ -35,13 +37,12 @@ namespace TestRuns.Utilities
                 var testName = results[i].testName.GetTestMethodName();
                 var error = results[i].Output.ErrorInfo == null ? "Passed" : results[i].Output.ErrorInfo.Message.Trim().Replace(',', '-').Replace("\r\n", ". ");
                 var resultReport = new ResultReport(
-                    i + 1, 
+                    i + 1,
+                    results[i].outcome,
                     "", 
                     results[i].testName.GetTestCaseNumber(), 
                     testName,
-                    error,
-                    results[i].RunName,
-                    results[i].Env);
+                    error);
 
                 resultReports.Add(resultReport);
             }

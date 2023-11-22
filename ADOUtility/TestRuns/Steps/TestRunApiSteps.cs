@@ -146,7 +146,7 @@ namespace TestRuns.Steps
             if (!blockedTests.Any())
                 return null;
 
-            var uiFailedBlockedTests = ResultReportConverter.Convert(blockedTests.GetFailedResults());
+            var uiFailedBlockedTests = ResultReportConverter.Convert(blockedTests.GetNotPassedResults());
             var uiFailedBlockedTestsWithComments = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blockers", uiFailedBlockedTests);
 
             return uiFailedBlockedTestsWithComments;

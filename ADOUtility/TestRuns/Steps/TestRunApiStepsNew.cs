@@ -144,9 +144,9 @@ namespace TestRuns.Steps
                 return null;
 
             var uiFailedBlockedTests = ResultReportConverter.Convert(testRunResults);
-            var uiFailedBlockedTestsWithComments = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blockers", uiFailedBlockedTests);
+            //uiFailedBlockedTests = new ReportFileSteps().CompareResultsWithBlockers(saveFolder, "Blockers", uiFailedBlockedTests);
 
-            return uiFailedBlockedTestsWithComments;
+            return uiFailedBlockedTests;
         }
 
         private List<TestRun> GetTxrAttachments(IEnumerable<(int runId, int attchId)> ids)
@@ -216,7 +216,7 @@ namespace TestRuns.Steps
             var runAttchmentsInfos = GetRunAttchmentsInfo(runInfos);
             var runAttchmentsIds = GetAttchsIdsByType(runAttchmentsInfos, ".trx");
             var testRunTrxAttachments = GetTestRunTrxAttachments(runAttchmentsIds);
-            var testRunResults = testRunTrxAttachments.Where(trx => trx.testRunAttach.Results != null).SelectMany(trx => {
+            var testRunResults = testRunTrxAttachments.Where(trx => trx.testRunAttach != null && trx.testRunAttach.Results != null).SelectMany(trx => {
                 var results = trx.testRunAttach.Results;
                  foreach (var result in results)
                     {

@@ -8,11 +8,21 @@ namespace ADOCore.Models
         public static List<TestRunUnitTestResult> GetPassedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
             => allTestResults.Where(x => x.outcome == "Passed").ToList();
 
-        public static List<TestRunUnitTestResult> GetFailedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
+        public static List<TestRunUnitTestResult> GetNotPassedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
         {
             var groups = allTestResults
                 .GroupBy(r => r.testName);
             var failedGroups = groups.Where(gr => !gr.Where(r => r.outcome == "Passed").Any());
+            var results = failedGroups.Select(gr => gr.Last()).ToList();
+
+            return results;
+        }
+
+        public static List<TestRunUnitTestResult> GetNotExecutedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
+        {
+            var groups = allTestResults
+                   .GroupBy(r => r.testName);
+            var failedGroups = groups.Where(gr => gr.Where(r => r.outcome == "NotExecuted").Any());
             var results = failedGroups.Select(gr => gr.Last()).ToList();
 
             return results;

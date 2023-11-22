@@ -36,12 +36,11 @@ namespace TestRuns.Utilities
             var headerRow = failedUiSheet.CreateRow(0);
             var style = stylesBuilder.GetHeaderBottomBorderStyle();
             headerRow.CreateCell(0, "N", style);
-            headerRow.CreateCell(1, "Reason", style);
-            headerRow.CreateCell(2, "TestCase N", style);
-            headerRow.CreateCell(3, "Test Method", style);
-            headerRow.CreateCell(4, "Error", style);
-            headerRow.CreateCell(5, "Run Name", style);
-            headerRow.CreateCell(6, "Env", style);
+            headerRow.CreateCell(1, "Outcome", style);
+            headerRow.CreateCell(2, "Reason", style);
+            headerRow.CreateCell(3, "TestCase N", style);
+            headerRow.CreateCell(4, "Test Method", style);
+            headerRow.CreateCell(5, "Error", style);
         }
 
         private void CreateFailedUiList(List<ResultReport> testResults)
@@ -50,17 +49,15 @@ namespace TestRuns.Utilities
             testResults = testResults.OrderBy(result => result.Reason).ThenBy(result => result.Error).ToList();
             for (int i = 0; i < testResults.Count; i++)
             {
-                var runName = testResults[i].RunName.Contains("ATDD_BVTPriority0") ? "ATDD_BVTPriority0" : testResults[i].RunName.Split('_')[1];
-                runName = testResults[i].RunName.Contains("Block") ? runName + "BLOCK": runName;
+                var outcome = testResults[i].Outcome.Contains("Block") ? testResults[i].Outcome + " BLOCK": testResults[i].Outcome;
 
                 var row = failedUiSheet.CreateRow(i + 1);
                 row.CreateCell(0, i + 1, style);
-                row.CreateCell(1, testResults[i].Reason, style);
-                row.CreateCell(2, Convert.ToInt32(string.IsNullOrEmpty(testResults[i].TestCaseNumber) ? "0" : testResults[i].TestCaseNumber), style);
-                row.CreateCell(3, testResults[i].TestMethodName, style);
-                row.CreateCell(4, testResults[i].Error, style);
-                row.CreateCell(5, runName, style);
-                row.CreateCell(6, testResults[i].BuildName, style);
+                row.CreateCell(1, outcome, style);
+                row.CreateCell(2, testResults[i].Reason, style);
+                row.CreateCell(3, Convert.ToInt32(string.IsNullOrEmpty(testResults[i].TestCaseNumber) ? "0" : testResults[i].TestCaseNumber), style);
+                row.CreateCell(4, testResults[i].TestMethodName, style);
+                row.CreateCell(5, testResults[i].Error, style);
             }
         }
     }

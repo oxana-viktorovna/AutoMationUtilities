@@ -6,12 +6,11 @@ namespace TestRuns.Models
     {
         public ResultReport(
             int num,
+            string outcome,
             string reason,
             string testcase, 
             string testMethod, 
-            string error,
-            string runName="",
-            string buildName = ""
+            string error
             )
         {
             Number = num;
@@ -19,26 +18,7 @@ namespace TestRuns.Models
             TestMethodName = testMethod;
             Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
             Reason = reason;
-            RunName = runName;
-            BuildName = buildName;
-        }
-
-        public ResultReport(
-            string reason,
-            string testcase,
-            string testMethod,
-            string error,
-            string runName="",
-            string buildName = ""
-            )
-        {
-            Number = 0;
-            TestCaseNumber = testcase;
-            TestMethodName = testMethod;
-            Error = "\"" + error.Replace("\r\n", "").Replace("\n", "").Replace(",", "") + "\"";
-            Reason = reason;
-            RunName = runName;
-            BuildName = buildName;
+            Outcome = outcome;
         }
 
         public int Number { get; set; }
@@ -46,14 +26,14 @@ namespace TestRuns.Models
         public string TestMethodName { get; set; }
         public string Error { get; set; }
         public string Reason { get; set; }
-        public string RunName { get; set; }
-        public string BuildName { get; set; }
+        public string Outcome { get; set; }
     }
 
     public static class ResultReportExtension
     {
         public static string ToCsvLine(this ResultReport result, string splitter)
-        => result.Number + splitter 
+        => result.Number + splitter
+            + result.Outcome
             + result.Reason  + splitter 
             + result.TestCaseNumber + splitter 
             + result.TestMethodName + splitter 
@@ -66,6 +46,7 @@ namespace TestRuns.Models
             var headers = new List<string>()
             {
             "N",
+            "OutCome",
             "Reason",
             "Test Case N",
             "Test Method Name",
