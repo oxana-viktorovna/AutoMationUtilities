@@ -1,6 +1,16 @@
 {
-  "firstTimeRun": true, //true is hadn't gathered statistic before. All initial files will be generated based on statistic resources
+  "firstTimeRun": false, //true is hadn't gathered statistic before. All initial files will be generated based on statistic resources
   "saveFolder": "",
   "asOfDate": "", //If blank will be taken as DateTime.Now
-  "defaultAreaPathes": []
+  "defaultAreaPathes": [
+    "Tracker\\Biscuits (Team Two)",
+    "Tracker\\EPAM Hammers Team",
+    "Tracker\\EPAM KaliLaska Team",
+    "Tracker\\EPAM Miners Team",
+    "Tracker\\Muffins",
+    "Tracker\\Fixiki",
+    "Tracker\\Platform Team - Legal Tracker Services",
+    "Tracker\\Platform Team",
+    "Tracker\\Popcorn (Team Two)"
+  ]
 }

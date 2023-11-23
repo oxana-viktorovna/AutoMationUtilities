@@ -43,6 +43,32 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
+        public int GetNumTests(string areaPath, string tag, int? priority, bool automated = false)
+        {
+            var queryBuilder = new WorkItemQueryBuilder()
+                   .AddAttributesToGet("[System.Id]")
+                   .AddAttributesToGet("[System.Title]")
+                   .AddAttributesToGet("[Microsoft.VSTS.Common.Priority]")
+                   .AddAttributesToGet("[Microsoft.VSTS.TCM.AutomationStatus]")
+                   .AddConditions("[System.TeamProject] = @project")
+                   .AddConditions("AND [System.WorkItemType] = 'Test Case'");
+            if (areaPath != null)
+                queryBuilder.AddConditions($"AND [System.AreaPath] UNDER '{areaPath}'");
+            if (tag != null)
+                queryBuilder.AddConditions($"AND [System.Tags] CONTAINS '{tag}'");
+            if (priority != null)
+                queryBuilder.AddSinglePriorityCondition(priority.Value, "=");
+            if (automated)
+                queryBuilder.AddAutomationStatusCondition("Automated", "=");
+
+            var query = queryBuilder.AddAsOf(asOf)
+                   .Build();
+
+            var queryResult = wiqlApiClient.PostWiqlQuery(query);
+
+            return queryResult.workItems.Length;
+        }
+
         internal int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();

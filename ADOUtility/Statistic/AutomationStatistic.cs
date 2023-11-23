@@ -5,7 +5,9 @@ using Statistic.Settings;
 using Statistic.Steps;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Statistic
 {
@@ -17,13 +19,15 @@ namespace Statistic
         {
             adoSettings = new AdoSettings(new SettingsReader("ADOconfig.json"));
             autoStatSettings = new AutoStatisticSettings(new SettingsReader("AutoStatisticSettings.json"));
-            autoStatSteps = new AutomationStatisticSteps(adoSettings, autoStatSettings.DefaultAreaPathes, autoStatSettings.AsOf);
+            defaultAreaPathes = autoStatSettings.DefaultAreaPathes;
+            autoStatSteps = new AutomationStatisticSteps(adoSettings, defaultAreaPathes, autoStatSettings.AsOf);
+
         }
 
         private AdoSettings adoSettings;
         private AutoStatisticSettings autoStatSettings;
         private AutomationStatisticSteps autoStatSteps;
-
+        private List<string> defaultAreaPathes;
 
         [TestMethod]
         public void GetAutoTestCoverage()
@@ -36,8 +40,36 @@ namespace Statistic
                 ("2+", autoStatSteps.GetAutomatedTestCountByPriority(otherPriorities), autoStatSteps.GetTestCountByPriority(otherPriorities))
             };
 
-            Assert.Inconclusive(Environment.NewLine + string.Join(Environment.NewLine,rawStat.Select(stat => $"priority {stat.priority} automated {stat.autoCount} all test cases {stat.allCount}")));
+            Assert.Inconclusive(Environment.NewLine + "All automated " + rawStat.Sum(stat => stat.autoCount) + " All test cases " + rawStat.Sum(stat => stat.allCount) +
+                Environment.NewLine + string.Join(Environment.NewLine,rawStat.Select(stat => $"priority {stat.priority} automated {stat.autoCount} all test cases {stat.allCount}")));
 
+        }
+
+        [TestMethod]
+        public void Get255Scope()
+        {
+            var stistic = new StringBuilder("AreaPath \t P0 \t P1");
+            stistic.AppendLine();
+            foreach (var areaPath in defaultAreaPathes)
+            {
+                stistic.Append(areaPath + "\t");
+                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 0) + "\t");
+                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 1) + "\t");
+                stistic.AppendLine();
+            }
+
+            stistic.AppendLine();
+            stistic.Append("AreaPath \t P0_AUTO \t P1_AUTO");
+            stistic.AppendLine();
+            foreach (var areaPath in defaultAreaPathes)
+            {
+                stistic.Append(areaPath + "\t");
+                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 0, true) + "\t");
+                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 1, true) + "\t");
+                stistic.AppendLine();
+            }
+
+            Assert.Inconclusive(stistic.ToString());
         }
     }
 }
