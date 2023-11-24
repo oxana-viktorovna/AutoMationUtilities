@@ -63,7 +63,6 @@ namespace TestRuns
             reportBuilder.SaveReport();
         }
 
-        //
         [TestMethod]
         public void GetTestIdsOfTestSuitInTestPlan()
         {
@@ -73,13 +72,12 @@ namespace TestRuns
             reportBuilder.DfltFileName = "TestIds";
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
 
-            var testResults = apiStepsNew.GetTestIdsAndNamesFromNestedSuit(testSettings.TestPlanId, testSettings.TestSuitId);
+            var testResults = apiStepsNew.GetTestIdNamePairs(testSettings.TestPlanId, testSettings.TestSuitId);
             var testIds = apiStepsNew.DivideIntoBatches(testResults, 3);
 
             uiReportBuilder.CreateTestIdsReport(ResultReportConverter.ConvertToTestInfo(testIds));
             reportBuilder.SaveReport();
         }
-        //
 
         [TestMethod]
         public void GetPassedOnReRunUiRunResultsByBuild()

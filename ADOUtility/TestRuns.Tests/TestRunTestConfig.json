@@ -1,5 +1,5 @@
 ﻿{
-  "saveFolder": "C:\\Users\\Laura_Hambardzumyan\\Documents\\GitHub\\TestResultsAnalyse",
+  "saveFolder": "C:\\Users\\Laura_Hambardzumyan\\OneDrive - EPAM\\Documents\\GitHub\\TestResultsAnalyse",
 
   "currentTestRun": {
     "buildIds": [ 589375 ], //For builds which run splitted tests (e.g. nightly, hotfix) put both build ids with comma separator.
@@ -7,7 +7,7 @@
     "runDuration": "",
     "runPostffix": "",
     "TestPlanId": " 199475 ",
-    "TestSuitId": " 199476 "
+    //"TestSuitId": " 199476 "
   },
   "previousTestRun": {
     "buildId": "",

@@ -31,8 +31,8 @@ namespace ADOCore.ApiClietns
             string apiUrl;
             Type responseType;
             string response;
-            if (suitId.HasValue)
-            {
+            if (suitId != 0)
+            { 
                 apiUrl = $"testplan/Plans/{planId}/suites/{suitId}?expand=Children&api-version=7.2-preview.1";
             }
             else
@@ -42,10 +42,10 @@ namespace ADOCore.ApiClietns
             response = SendAdoRequest(apiUrl, Method.GET).Content;
             return JsonSerializer.Deserialize<T>(response);
         }
-        public TestCaseResponce GetTestIds(int planId, int suitId)
+        public TestCaseResponse GetTestIds(int planId, int suitId)
         {
             var response = SendAdoRequest($"testplan/Plans/{planId}/Suites/{suitId}/TestCase", Method.GET);
-            var testPlanInfo = JsonSerializer.Deserialize<TestCaseResponce>(response.Content);
+            var testPlanInfo = JsonSerializer.Deserialize<TestCaseResponse>(response.Content);
             return testPlanInfo;
         }
 

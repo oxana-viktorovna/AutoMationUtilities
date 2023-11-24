@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ADOCore.Models
 {
-    public class TestCaseResponce
+    public class TestCaseResponse
     {
         [JsonProperty("value")]
         public List<TestPlanDetail> value { get; set; }
@@ -37,11 +37,7 @@ namespace ADOCore.Models
         public int id { get; set; }
         public string name { get; set; }
     }
-    public class WorkItemField
-    {
-        public string fieldName { get; set; }
-        public string value { get; set; }
-    }
+
     public class PointAssignment
     {
         public int id { get; set; }

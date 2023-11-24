@@ -24,7 +24,7 @@ namespace TestRuns.Utilities
 
         public void CreateTestIdsReport(List<TestInfo> testInfo)
         {
-            CreateFailedUiHeaders();
+            CreateTestIdHeaders();
             CreateFailedUiList(testInfo);
         }
 
@@ -57,6 +57,21 @@ namespace TestRuns.Utilities
             headerRow.CreateCell(0, "N", style);
             headerRow.CreateCell(1, "Name", style);
             headerRow.CreateCell(2, "Id", style);
+        }
+
+        private void CreateTestIdList(List<TestInfo> testResults)
+        {
+            var style = stylesBuilder.GetRegularBottomBorderStyle();
+            testResults = testResults.OrderBy(result => result.Id).ThenBy(result => result.Name).ToList();
+            for (int i = 0; i < testResults.Count; i++)
+            {
+                var id = testResults[i].Id;
+
+                var row = failedUiSheet.CreateRow(i + 1);
+                row.CreateCell(0, i + 1, style);
+                row.CreateCell(1, id, style);
+                row.CreateCell(2, testResults[i].Name, style);
+            }
         }
 
         private void CreateFailedUiList(List<TestInfo> testInfo)

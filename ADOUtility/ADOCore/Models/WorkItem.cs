@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace ADOCore.Models
@@ -10,8 +11,44 @@ namespace ADOCore.Models
         public Fields fields { get; set; }
         public _Links5 _links { get; set; }
         public string url { get; set; }
-        public string Name { get; set; }
-        public List<WorkItemField> WorkItemFields { get; set; }
+        public string name { get; set; }
+        public List<Dictionary<string, object>> workItemFields { get; set; }
+    }
+
+    public class WorkItemField
+    {
+        [JsonProperty("Microsoft.VSTS.TCM.Steps")]
+        public string MicrosoftVSTSTCMSteps { get; set; }
+        [JsonProperty("Microsoft.VSTS.Common.ActivatedBy")]
+        public string MicrosoftVSTSCommonActivatedBy { get; set; }
+        [JsonProperty("Microsoft.VSTS.Common.ActivatedDate")]
+        public string MicrosoftVSTSCommonActivatedDate { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.AutomationStatus")]
+        public string MicrosoftVSTSTCMAutomationStatus { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.LocalDataSource")]
+        public string MicrosoftVSTSTCMLocalDataSource { get; set; }
+        [JsonProperty("System.Description")]
+        public string SystemDescription { get; set; }
+        [JsonProperty("System.State")]
+        public string SystemState { get; set; }
+        [JsonProperty("System.AssignedTo")]
+        public string SystemAssignedTo { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.Parameters")]
+        public string MicrosoftVSTSTCMParameters { get; set; }
+        [JsonProperty("Microsoft.VSTS.Common.Priority")]
+        public int MicrosoftVSTSCommonPriority { get; set; }
+        [JsonProperty("Microsoft.VSTS.Common.StateChangeDate")]
+        public string MicrosoftVSTSCommonStateChangeDate { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.AutomatedTestStorage")]
+        public string MicrosoftVSTSTCMAutomatedTestStorage { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.AutomatedTestId")]
+        public Guid MicrosoftVSTSTCMAutomatedTestId { get; set; }
+        [JsonProperty("Microsoft.VSTS.TCM.AutomatedTestName")]
+        public string MicrosoftVSTSTCMAutomatedTestName { get; set; }
+        [JsonProperty("System.WorkItemType")]
+        public string SystemWorkItemType { get; set; }
+        [JsonProperty("System.Rev")]
+        public int SystemRev { get; set; }
     }
 
     public class Fields
