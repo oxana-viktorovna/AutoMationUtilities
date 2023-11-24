@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ADOCore.Models
 {
@@ -9,6 +10,8 @@ namespace ADOCore.Models
         public Fields fields { get; set; }
         public _Links5 _links { get; set; }
         public string url { get; set; }
+        public string Name { get; set; }
+        public List<WorkItemField> WorkItemFields { get; set; }
     }
 
     public class Fields

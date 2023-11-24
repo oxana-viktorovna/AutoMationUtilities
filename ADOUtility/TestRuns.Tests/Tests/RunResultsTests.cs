@@ -63,6 +63,24 @@ namespace TestRuns
             reportBuilder.SaveReport();
         }
 
+        //
+        [TestMethod]
+        public void GetTestIdsOfTestSuitInTestPlan()
+        {
+            var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
+            var currFileName = $"Test_Ids_{shortBuildName}{testSettings.CurrRunPostffix}";
+            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
+            reportBuilder.DfltFileName = "TestIds";
+            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
+
+            var testResults = apiStepsNew.GetTestIdsAndNamesFromNestedSuit(testSettings.TestPlanId, testSettings.TestSuitId);
+            var testIds = apiStepsNew.DivideIntoBatches(testResults, 3);
+
+            uiReportBuilder.CreateTestIdsReport(ResultReportConverter.ConvertToTestInfo(testIds));
+            reportBuilder.SaveReport();
+        }
+        //
+
         [TestMethod]
         public void GetPassedOnReRunUiRunResultsByBuild()
         {
@@ -72,7 +90,7 @@ namespace TestRuns
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             reportBuilder.DfltFileName = "PassedOnrerun";
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
-
+            
             var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
             var uiPassedOnReRunTests = allTestResults.GetPassedOnReRunResults();
 

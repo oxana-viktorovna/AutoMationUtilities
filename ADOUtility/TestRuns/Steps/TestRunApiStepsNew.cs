@@ -208,6 +208,67 @@ namespace TestRuns.Steps
             return allBuildIds.SelectMany(buildId => GetTrxAttachments(buildId)).ToList();
         }
 
+        public List<(string Id, string Name)> GetTestIdsAndNamesFromNestedSuit(int planId, int? suitId)
+        {
+            if (suitId.HasValue)
+            {
+                var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, suitId);
+                var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
+                if (nestedSuiteIds != null && nestedSuiteIds.Any())
+                {
+                    int selectedSuiteId = nestedSuiteIds[1];
+                    var testCaseResponse = testRunApiClient.GetTestIds(planId, selectedSuiteId);
+                    if (testCaseResponse != null && testCaseResponse.value != null)
+                    {
+                        var testPairs = testCaseResponse.value
+                            .Select(tp => (
+                                Id: tp.pointAssignments
+                                    .FirstOrDefault(pa => pa.configurationName == "Microsoft.VSTS.TCM.AutomationTestId")?
+                                    .configurationId.ToString(),
+                                Name: tp.pointAssignments
+                                    .FirstOrDefault(pa => pa.configurationName == "Microsoft.VSTS.TCM.AutomatedTestName")?
+                                    .configurationName))
+                            .ToList();
+                        return testPairs;
+                    }
+                }
+            }
+            else
+            {
+                var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithoutNestedSuits>(planId, suitId);
+            }
+            return new List<(string Id, string Name)>();
+        }
+
+        public List<List<(string Id, string Name)>> DivideIntoBatches(List<(string Id, string Name)> testPairs, int batchCount)
+        {
+            List<List<(string Id, string Name)>> batches = new List<List<(string Id, string Name)>>();
+            for (int i = 0; i < batchCount; i++)
+            {
+                batches.Add(new List<(string Id, string Name)>());
+            }
+            var classGroup = testPairs.GroupBy(pair => GetClassName(pair.Name));
+            foreach (var group in classGroup)
+            {
+                int currentBatchIndex = 0;
+                foreach (var pair in group)
+                {
+                    batches[currentBatchIndex].Add((pair.Id, pair.Name));
+                    currentBatchIndex = (currentBatchIndex + 1) % batchCount;
+                }
+            }
+            return batches;
+        }
+        private string GetClassName(string testName)
+        {
+            var match = Regex.Match(testName, @".*Tests.");
+            if (match.Success)
+            {
+                return match.Value.Replace(".", "");
+            }
+            return "UnknownClass";
+        }
+
         public List<TestRunUnitTestResult> GetTrxAttachments(int buildId)
         {
 
@@ -247,7 +308,6 @@ namespace TestRuns.Steps
             return runInfos;
 
         }
-
         #endregion Trx
 
         #region JUnit

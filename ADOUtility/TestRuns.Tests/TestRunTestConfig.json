@@ -1,11 +1,13 @@
 ﻿{
-  "saveFolder": "C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\TestResultsAnalyse",
+  "saveFolder": "C:\\Users\\Laura_Hambardzumyan\\Documents\\GitHub\\TestResultsAnalyse",
 
   "currentTestRun": {
-    "buildIds": [ ], //For builds which run splitted tests (e.g. nightly, hotfix) put both build ids with comma separator.
+    "buildIds": [ 589375 ], //For builds which run splitted tests (e.g. nightly, hotfix) put both build ids with comma separator.
     "RerunBuildIds": [],
     "runDuration": "",
-    "runPostffix": ""
+    "runPostffix": "",
+    "TestPlanId": " 199475 ",
+    "TestSuitId": " 199476 "
   },
   "previousTestRun": {
     "buildId": "",

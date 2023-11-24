@@ -16,6 +16,8 @@ namespace TestRuns
             PreviousBuildId = GetIntSetting(reader, "previousTestRun:buildId");
             CurrRunPostffix = GetPostfix(reader,"currentTestRun:runPostffix");
             PreviousRunPostffix = GetPostfix(reader,"previousTestRun:runPostffix");
+            TestPlanId = GetIntSetting(reader, "currentTestRun:TestPlanId");
+            TestSuitId = GetIntSetting(reader, "currentTestRun:TestSuitId");
         }
 
         public string SaveFolder { get; private set; }
@@ -26,6 +28,8 @@ namespace TestRuns
         public int PreviousBuildId { get; private set; }
         public string CurrRunPostffix { get; private set; }
         public string PreviousRunPostffix { get; private set; }
+        public int TestPlanId { get; private set; }
+        public int TestSuitId { get; private set; }
 
         private int GetIntSetting(SettingsReader reader, string settingName)
         {

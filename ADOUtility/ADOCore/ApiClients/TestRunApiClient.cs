@@ -26,6 +26,29 @@ namespace ADOCore.ApiClietns
             return runsInfo;
         }
 
+        public T GetTestPlanDetails<T>(int planId, int? suitId)
+        {
+            string apiUrl;
+            Type responseType;
+            string response;
+            if (suitId.HasValue)
+            {
+                apiUrl = $"testplan/Plans/{planId}/suites/{suitId}?expand=Children&api-version=7.2-preview.1";
+            }
+            else
+            {
+                apiUrl = $"testplan/Plans/{planId}/suites?api-version=7.2-preview.1";
+            }
+            response = SendAdoRequest(apiUrl, Method.GET).Content;
+            return JsonSerializer.Deserialize<T>(response);
+        }
+        public TestCaseResponce GetTestIds(int planId, int suitId)
+        {
+            var response = SendAdoRequest($"testplan/Plans/{planId}/Suites/{suitId}/TestCase", Method.GET);
+            var testPlanInfo = JsonSerializer.Deserialize<TestCaseResponce>(response.Content);
+            return testPlanInfo;
+        }
+
         public RunStat GetRunStatistic(int runId)
         {
             var response = SendAdoRequest($"test/Runs/{runId}/Statistics", Method.GET);

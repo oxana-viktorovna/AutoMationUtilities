@@ -184,5 +184,7 @@ namespace ADOCore.Models
     public class Plan
     {
         public string planId { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }
