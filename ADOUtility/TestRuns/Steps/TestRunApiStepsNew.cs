@@ -208,41 +208,51 @@ namespace TestRuns.Steps
             return allBuildIds.SelectMany(buildId => GetTrxAttachments(buildId)).ToList();
         }
 
+        private void ProcessTestPlanDetails(List<(string, string)> testPairs, int planId, List<int> suiteIds)
+        {
+            if (suiteIds != null && suiteIds.Any())
+            {
+                int selectedSuiteId = suiteIds[1];
+                var testCaseResponse = testRunApiClient.GetTestIds(planId, selectedSuiteId);
+                if (testCaseResponse != null && testCaseResponse.value != null && testCaseResponse.value.Any())
+                {
+                    foreach (var testPlanDetail in testCaseResponse.value)
+                    {
+                        var automatedTestIdToken = testPlanDetail.workItem?.workItemFields
+                            ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestId"))
+                            ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestId")?.ToString();
+                        var automatedTestNameToken = testPlanDetail.workItem?.workItemFields
+                            ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestName"))
+                            ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestName")?.ToString();
+                        testPairs.Add((automatedTestIdToken, automatedTestNameToken));
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("The response is empty.");
+                }
+            }
+        }
         public List<(string AutomatedTestId, string AutomatedTestName)> GetTestIdNamePairs(int planId, int? suitId)
         {
             List<(string AutomatedTestId, string AutomatedTestName)> testPairs = new List<(string, string)>();
-
-            if (suitId!=0)
+            if (suitId != 0)
             {
                 var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, suitId);
                 var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
                 if (nestedSuiteIds != null && nestedSuiteIds.Any())
                 {
-                    int selectedSuiteId = nestedSuiteIds[1];
-                    var testCaseResponse = testRunApiClient.GetTestIds(planId, selectedSuiteId);
-
-                    if (testCaseResponse != null && testCaseResponse.value != null && testCaseResponse.value.Any())
-                    {
-                        foreach (var testPlanDetail in testCaseResponse.value)
-                        {
-                            var automatedTestIdToken = testPlanDetail.workItem?.workItemFields
-                                ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestId"))
-                                ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestId")?.ToString();
-                            var automatedTestNameToken = testPlanDetail.workItem?.workItemFields
-                                ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestName"))
-                                ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestName")?.ToString();
-                            testPairs.Add((automatedTestIdToken, automatedTestNameToken));
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("The response is empty.");
-                    }
+                    ProcessTestPlanDetails(testPairs, planId, nestedSuiteIds);
                 }
             }
             else
             {
                 var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithoutNestedSuits>(planId, suitId);
+                if (testPlanDetails != null && testPlanDetails.value != null && testPlanDetails.value.Any())
+                {
+                    var suiteIds = testPlanDetails.value.Select(s => s.id).ToList();
+                    ProcessTestPlanDetails(testPairs, planId, suiteIds);
+                }
             }
             return testPairs;
         }
