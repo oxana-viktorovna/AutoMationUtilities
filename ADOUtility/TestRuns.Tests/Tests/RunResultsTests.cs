@@ -72,7 +72,7 @@ namespace TestRuns
             var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
             reportBuilder.DfltFileName = "PassedOnrerun";
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
-
+            
             var allTestResults = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);
             var uiPassedOnReRunTests = allTestResults.GetPassedOnReRunResults();
 

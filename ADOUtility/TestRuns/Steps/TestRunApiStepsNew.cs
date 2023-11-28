@@ -13,11 +13,13 @@ namespace TestRuns.Steps
         public TestRunApiStepsNew(AdoSettings adoSettings)
         {
             testRunApiClient = new TestRunApiClient(adoSettings);
+            testPlanApiClient = new TestPlanApiClient(adoSettings);
             testResultDetailApiClient = new ResultDetailsByBuildApiClient(adoSettings);
             buildApiSteps = new BuildApiSteps(adoSettings);
         }
 
         private readonly TestRunApiClient testRunApiClient;
+        private readonly TestPlanApiClient testPlanApiClient;
         private readonly ResultDetailsByBuildApiClient testResultDetailApiClient;
         private readonly BuildApiSteps buildApiSteps;
 
@@ -208,6 +210,94 @@ namespace TestRuns.Steps
             return allBuildIds.SelectMany(buildId => GetTrxAttachments(buildId)).ToList();
         }
 
+        public List<(string TestCaseId, string TestCaseName)> GetTestIdNamePairs(int planId, int? suitId)
+        {
+            List<(string TestCaseId, string TestCaseName)> testPairs = new List<(string, string)>();
+            if (suitId != 0)
+            {
+                var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, suitId);
+                var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
+                if (nestedSuiteIds != null && nestedSuiteIds.Any())
+                {
+                    ProcessTestPlanDetails(testPairs, planId, nestedSuiteIds);
+                }
+            }
+            else
+            {
+                var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithoutNestedSuits>(planId, suitId);
+                if (testPlanDetails != null && testPlanDetails.value != null && testPlanDetails.value.Any())
+                {
+                    var suiteIds = testPlanDetails.value.Select(s => s.id).ToList();
+                    ProcessTestPlanDetails(testPairs, planId, suiteIds);
+                }
+            }
+            return testPairs;
+        }
+
+        public List<List<(string Id, string Name)>> DivideIntoBatches(List<(string Id, string Name)> testPairs, int batchCount)
+        {
+            List<List<(string Id, string Name)>> batches = new List<List<(string Id, string Name)>>();
+            for (int i = 0; i < batchCount; i++)
+            {
+                batches.Add(new List<(string Id, string Name)>());
+            }
+            var classGroup = testPairs.GroupBy(pair => GetClassName(pair.Name));
+            foreach (var group in classGroup)
+            {
+                int currentBatchIndex = 0;
+                foreach (var pair in group)
+                {
+                    batches[currentBatchIndex].Add((pair.Id, pair.Name));
+                    currentBatchIndex = (currentBatchIndex + 1) % batchCount;
+                }
+            }
+            return batches;
+        }
+
+        private void ProcessTestPlanDetails(List<(string, string)> testPairs, int planId, List<int> suiteIds)
+        {
+            if (suiteIds != null && suiteIds.Any())
+            {
+                foreach (var selectedSuiteId in suiteIds) 
+                {
+                    var testCaseResponse = testPlanApiClient.GetTestIds(planId, selectedSuiteId);
+                    if (testCaseResponse != null && testCaseResponse.value != null && testCaseResponse.value.Any())
+                    {
+                        foreach (var testPlanDetail in testCaseResponse.value)
+                        {
+                            var testId = testPlanDetail.workItem?.id.ToString();
+                            var testName = testPlanDetail.workItem?.workItemFields
+                                ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestName"))
+                                ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestName")?.ToString();
+                            testPairs.Add((testId, testName));
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("The response is empty.");
+                    }
+
+                    var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, selectedSuiteId);
+                    var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
+
+                    if (nestedSuiteIds != null && nestedSuiteIds.Any())
+                    {
+                        ProcessTestPlanDetails(testPairs, planId, nestedSuiteIds);
+                    }
+                }
+            }
+        }
+
+        private string GetClassName(string testName)
+        {
+            var match = Regex.Match(testName, @".*Tests.");
+            if (match.Success)
+            {
+                return match.Value.Replace(".", "");
+            }
+            return "UnknownClass";
+        }
+
         public List<TestRunUnitTestResult> GetTrxAttachments(int buildId)
         {
 
@@ -247,7 +337,6 @@ namespace TestRuns.Steps
             return runInfos;
 
         }
-
         #endregion Trx
 
         #region JUnit

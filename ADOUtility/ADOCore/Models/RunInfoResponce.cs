@@ -70,6 +70,13 @@ namespace ADOCore.Models
     public class Links
     {
         public Avatar avatar { get; set; }
+        public LinkDetails TestPoints { get; set; }
+        public LinkDetails Configuration { get; set; }
+        public LinkDetails Self { get; set; }
+        public LinkDetails SourcePlan { get; set; }
+        public LinkDetails SourceSuite { get; set; }
+        public LinkDetails SourceProject { get; set; }
+        public TestCases TestCases { get; set; }
     }
 
     public class Avatar
