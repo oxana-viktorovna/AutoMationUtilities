@@ -64,22 +64,6 @@ namespace TestRuns
         }
 
         [TestMethod]
-        public void GetTestIdsOfTestSuitInTestPlan()
-        {
-            var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);
-            var currFileName = $"Test_Ids_{shortBuildName}{testSettings.CurrRunPostffix}";
-            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, currFileName);
-            reportBuilder.DfltFileName = "TestIds";
-            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
-
-            var testResults = apiStepsNew.GetTestIdNamePairs(testSettings.TestPlanId, testSettings.TestSuitId);
-            var testIds = apiStepsNew.DivideIntoBatches(testResults, 3);
-
-            uiReportBuilder.CreateTestIdsReport(ResultReportConverter.ConvertToTestInfo(testIds));
-            reportBuilder.SaveReport();
-        }
-
-        [TestMethod]
         public void GetPassedOnReRunUiRunResultsByBuild()
         {
             var shortBuildName = buildApiSteps.GetBuildName(testSettings.CurrBuildIds);

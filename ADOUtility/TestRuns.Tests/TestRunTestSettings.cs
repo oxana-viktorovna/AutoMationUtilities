@@ -16,8 +16,8 @@ namespace TestRuns
             PreviousBuildId = GetIntSetting(reader, "previousTestRun:buildId");
             CurrRunPostffix = GetPostfix(reader,"currentTestRun:runPostffix");
             PreviousRunPostffix = GetPostfix(reader,"previousTestRun:runPostffix");
-            TestPlanId = GetIntSetting(reader, "currentTestRun:TestPlanId");
-            TestSuitId = GetIntSetting(reader, "currentTestRun:TestSuitId");
+            TestPlanId = GetIntSetting(reader, "testCasesInfo:TestPlanId");
+            TestSuitId = GetIntSetting(reader, "testCasesInfo:TestSuitId");
         }
 
         public string SaveFolder { get; private set; }

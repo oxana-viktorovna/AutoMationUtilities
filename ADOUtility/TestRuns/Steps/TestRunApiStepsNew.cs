@@ -13,11 +13,13 @@ namespace TestRuns.Steps
         public TestRunApiStepsNew(AdoSettings adoSettings)
         {
             testRunApiClient = new TestRunApiClient(adoSettings);
+            testPlanApiClient = new TestPlanApiClient(adoSettings);
             testResultDetailApiClient = new ResultDetailsByBuildApiClient(adoSettings);
             buildApiSteps = new BuildApiSteps(adoSettings);
         }
 
         private readonly TestRunApiClient testRunApiClient;
+        private readonly TestPlanApiClient testPlanApiClient;
         private readonly ResultDetailsByBuildApiClient testResultDetailApiClient;
         private readonly BuildApiSteps buildApiSteps;
 
@@ -208,37 +210,12 @@ namespace TestRuns.Steps
             return allBuildIds.SelectMany(buildId => GetTrxAttachments(buildId)).ToList();
         }
 
-        private void ProcessTestPlanDetails(List<(string, string)> testPairs, int planId, List<int> suiteIds)
+        public List<(string TestCaseId, string TestCaseName)> GetTestIdNamePairs(int planId, int? suitId)
         {
-            if (suiteIds != null && suiteIds.Any())
-            {
-                int selectedSuiteId = suiteIds[1];
-                var testCaseResponse = testRunApiClient.GetTestIds(planId, selectedSuiteId);
-                if (testCaseResponse != null && testCaseResponse.value != null && testCaseResponse.value.Any())
-                {
-                    foreach (var testPlanDetail in testCaseResponse.value)
-                    {
-                        var automatedTestIdToken = testPlanDetail.workItem?.workItemFields
-                            ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestId"))
-                            ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestId")?.ToString();
-                        var automatedTestNameToken = testPlanDetail.workItem?.workItemFields
-                            ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestName"))
-                            ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestName")?.ToString();
-                        testPairs.Add((automatedTestIdToken, automatedTestNameToken));
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("The response is empty.");
-                }
-            }
-        }
-        public List<(string AutomatedTestId, string AutomatedTestName)> GetTestIdNamePairs(int planId, int? suitId)
-        {
-            List<(string AutomatedTestId, string AutomatedTestName)> testPairs = new List<(string, string)>();
+            List<(string TestCaseId, string TestCaseName)> testPairs = new List<(string, string)>();
             if (suitId != 0)
             {
-                var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, suitId);
+                var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, suitId);
                 var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
                 if (nestedSuiteIds != null && nestedSuiteIds.Any())
                 {
@@ -247,7 +224,7 @@ namespace TestRuns.Steps
             }
             else
             {
-                var testPlanDetails = testRunApiClient.GetTestPlanDetails<TestPlanDetailsWithoutNestedSuits>(planId, suitId);
+                var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithoutNestedSuits>(planId, suitId);
                 if (testPlanDetails != null && testPlanDetails.value != null && testPlanDetails.value.Any())
                 {
                     var suiteIds = testPlanDetails.value.Select(s => s.id).ToList();
@@ -276,6 +253,41 @@ namespace TestRuns.Steps
             }
             return batches;
         }
+
+        private void ProcessTestPlanDetails(List<(string, string)> testPairs, int planId, List<int> suiteIds)
+        {
+            if (suiteIds != null && suiteIds.Any())
+            {
+                foreach (var selectedSuiteId in suiteIds) 
+                {
+                    var testCaseResponse = testPlanApiClient.GetTestIds(planId, selectedSuiteId);
+                    if (testCaseResponse != null && testCaseResponse.value != null && testCaseResponse.value.Any())
+                    {
+                        foreach (var testPlanDetail in testCaseResponse.value)
+                        {
+                            var testId = testPlanDetail.workItem?.id.ToString();
+                            var testName = testPlanDetail.workItem?.workItemFields
+                                ?.FirstOrDefault(field => field.ContainsKey("Microsoft.VSTS.TCM.AutomatedTestName"))
+                                ?.GetValueOrDefault("Microsoft.VSTS.TCM.AutomatedTestName")?.ToString();
+                            testPairs.Add((testId, testName));
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("The response is empty.");
+                    }
+
+                    var testPlanDetails = testPlanApiClient.GetTestPlanDetails<TestPlanDetailsWithNestedSuits>(planId, selectedSuiteId);
+                    var nestedSuiteIds = testPlanDetails?.children?.Select(s => s.id).ToList();
+
+                    if (nestedSuiteIds != null && nestedSuiteIds.Any())
+                    {
+                        ProcessTestPlanDetails(testPairs, planId, nestedSuiteIds);
+                    }
+                }
+            }
+        }
+
         private string GetClassName(string testName)
         {
             var match = Regex.Match(testName, @".*Tests.");
