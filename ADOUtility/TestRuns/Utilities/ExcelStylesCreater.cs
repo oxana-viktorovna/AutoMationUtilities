@@ -29,7 +29,7 @@ namespace TestRuns.Utilities
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(11, dfltFontName)
                 .AddAlignmrnt(VerticalAlignment.Top, HorizontalAlignment.Center)
-                .AddForegroundColor(Color.LightGray)
+                .AddForegroundColor(Color.Gray, tint:0.5)
                 .Build();
 
             return style;
@@ -62,6 +62,7 @@ namespace TestRuns.Utilities
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(14, dfltFontName)
                 .AddAlignmrnt(VerticalAlignment.Center, HorizontalAlignment.Left)
+                .AddForegroundColor(Color.Gray, tint:0.5)
                 .Build();
 
             return style;
@@ -72,7 +73,7 @@ namespace TestRuns.Utilities
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(14, dfltFontName)
                 .AddAlignmrnt(VerticalAlignment.Center, HorizontalAlignment.Left)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(Color.LightGray, tint: 0.5) 
                 .Build();
 
             return style;

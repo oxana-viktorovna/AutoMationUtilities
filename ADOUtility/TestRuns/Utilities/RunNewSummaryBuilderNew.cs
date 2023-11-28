@@ -33,15 +33,15 @@ namespace TestRuns.Utilities
 
             sumSheet = book.CreateSheet("Summary");
             
-            CreateHeaders(runDurection);
+            CreateHeaders();
             GenerateAllSectionsRows(runs);
-            CreateMainTotals();
+            CreateMainTotals(runDurection);
         }
 
         private void GenerateRowsNumbers(IEnumerable<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)> runs)
         {
-            var uiRuns = runs.Where(run => run.testType == TestType.Ui);
-            var apiRuns = runs.Where(run => run.testType == TestType.Api);
+            var uiRuns = runs.Where(run => run.testType == TestType.UI);
+            var apiRuns = runs.Where(run => run.testType == TestType.API);
             var scriptRuns = runs.Where(run => run.testType == TestType.Script);
             GenerateRowsNumbers(uiRuns.Count(), apiRuns.Count(), scriptRuns.Count());
         }
@@ -61,26 +61,29 @@ namespace TestRuns.Utilities
             scriptRowsNums.RunRowsLastNum = scriptRowsNums.SumRowNum + scriptRuns;
         }
 
-        private void CreateHeaders(string runDurection)
+        private void CreateHeaders()
         {
             var headerRow = sumSheet.CreateRow(0);
             var style = stylesBuilder.GetHeaderStyle();
             headerRow.CreateCell(0, "", style);
-            headerRow.CreateCell(1, $"Run duration: {runDurection}", style);
-            headerRow.CreateCell(2, "Total Tests", style);
-            headerRow.CreateCell(3, "Passed", style);
-            headerRow.CreateCell(4, "Not Executed", style);
-            headerRow.CreateCell(5, "Failed", style);
-            headerRow.CreateCell(6, "Pass percentage", style);
+            headerRow.CreateCell(1, "", style);
+            headerRow.CreateCell(2, "   TOTAL   ", style);
+            headerRow.CreateCell(3, "   PASSED   ", style);
+            headerRow.CreateCell(4, "NOT EXEC", style);
+            headerRow.CreateCell(5, "FAILED", style);
+            headerRow.CreateCell(6, "  PASS percentage  ", style);
         }
 
-        private void CreateMainTotals()
+        private void CreateMainTotals(string runDurection)
         {
             var rowNum = 1;
             var firstRow = sumSheet.CreateRow(rowNum);
 
             var sideBarStyle = stylesBuilder.GetSideBarStyle();
-            firstRow.CreateCell(0, "Totals", sideBarStyle);
+            sideBarStyle.Rotation = (short)90;
+            firstRow.CreateCell(0, "TOTALS", sideBarStyle);
+
+            firstRow.CreateCell(1, $"Run duration: {runDurection}");
 
             var totalTestsMainStyle = stylesBuilder.GetTotalTestsMainStyle();
             firstRow.CreateCellWithFormula(2, $"SUM(D{rowNum + 1}:F{rowNum + 1})", totalTestsMainStyle);
@@ -104,14 +107,14 @@ namespace TestRuns.Utilities
 
         public void GenerateAllSectionsRows(IEnumerable<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)> runs)
         {
-            var uiRuns = runs.Where(run => run.testType == TestType.Ui);
-            var apiRuns = runs.Where(run => run.testType == TestType.Api);
+            var uiRuns = runs.Where(run => run.testType == TestType.UI);
+            var apiRuns = runs.Where(run => run.testType == TestType.API);
             var scriptRuns = runs.Where(run => run.testType == TestType.Script);
 
-            var uiRowsNums = GetRowsNums(TestType.Ui);
+            var uiRowsNums = GetRowsNums(TestType.UI);
             CreateSectionRows(uiRuns, uiRowsNums);
 
-            var apiRowsNums = GetRowsNums(TestType.Api);
+            var apiRowsNums = GetRowsNums(TestType.API);
             CreateSectionRows(apiRuns, apiRowsNums);
 
             var scriptRowsNums = GetRowsNums(TestType.Script);
@@ -122,8 +125,8 @@ namespace TestRuns.Utilities
         {
             return testType switch
             {
-                TestType.Ui => uiRowsNums,
-                TestType.Api => apiRowsNums,
+                TestType.UI => uiRowsNums,
+                TestType.API => apiRowsNums,
                 TestType.Script => scriptRowsNums,
                 _ => throw new NotSupportedException($"Test type {testType} is not supported"),
             };
@@ -146,13 +149,14 @@ namespace TestRuns.Utilities
 
             GreateSectionTotalsRow(testType, rowNums, origRunCount);
 
-            if (testType == TestType.Ui)
+            if (testType == TestType.UI)
                 CreateLocalRunRow(rowNums.RunRowsLastNum);
         }
 
         private void GreateSectionTotalsRow(TestType testType, SummaryReportSectionRowsNums rowsNums, int origRunCount)
         {
             var sideBarStyle = stylesBuilder.GetSideBarWithForeGroundStyle();
+            sideBarStyle.Rotation = (short)90;
             var totalTestsStyle = stylesBuilder.GetTotalTestsStyle();
             var totalTestsMainStyle = stylesBuilder.GetTotalTestsStyle();
             var totalPassedMainStyle = stylesBuilder.GetTotalPassedStyle();
@@ -160,7 +164,7 @@ namespace TestRuns.Utilities
             var totalFailedMainStyle = stylesBuilder.GetTotalFailedStyle();
             var totalProcentMainStyle = stylesBuilder.GetTotalProcentStyle();
 
-            var row = sumSheet.CreateRow(rowsNums.SumRowNum);
+            var row = sumSheet.CreateRow(rowsNums.SumRowNum-3);
 
             row.CreateCell(0, testType.ToString(), sideBarStyle);
             row.CreateCell(1, "", totalTestsStyle);
@@ -218,8 +222,8 @@ namespace TestRuns.Utilities
 
     public enum TestType
     {
-        Ui,
-        Api,
+        UI,
+        API,
         Script
     }
 }
