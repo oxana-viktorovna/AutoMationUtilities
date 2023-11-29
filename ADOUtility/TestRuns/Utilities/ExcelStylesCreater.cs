@@ -24,11 +24,19 @@ namespace TestRuns.Utilities
             return style;
         }
 
+        public XSSFCellStyle GetSimpleWrapStyle()
+        {
+            var builder = new ExcelStyleBuilder(book);
+            var style = builder.AddFont(10, dfltFontName).Build();
+
+            return style;
+        }
+
         public XSSFCellStyle GetHeaderStyle()
         {
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(11, dfltFontName)
-                .AddAlignmrnt(VerticalAlignment.Top, HorizontalAlignment.Center)
+                .AddAlignment(VerticalAlignment.Top, HorizontalAlignment.Center)
                 .AddForegroundColor(Color.Gray, tint:0.5)
                 .Build();
 
@@ -39,7 +47,7 @@ namespace TestRuns.Utilities
         {
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(10, dfltFontName)
-                .AddAlignmrnt(VerticalAlignment.Top, HorizontalAlignment.Center)
+                .AddAlignment(VerticalAlignment.Top, HorizontalAlignment.Center)
                 .AddForegroundColor(Color.LightGray, tint: 0.5)
                 .AddBorder(bottom: BorderStyle.Thin)
                 .Build();
@@ -61,19 +69,25 @@ namespace TestRuns.Utilities
         {
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(14, dfltFontName)
-                .AddAlignmrnt(VerticalAlignment.Center, HorizontalAlignment.Left)
+                .AddAlignment(VerticalAlignment.Center, HorizontalAlignment.Left)
                 .AddForegroundColor(Color.Gray, tint:0.5)
                 .Build();
 
             return style;
         }
 
-        public XSSFCellStyle GetSideBarWithForeGroundStyle()
+        public XSSFCellStyle GetSideBarWithForeGroundStyle(string type = null)
         {
             var builder = new ExcelStyleBuilder(book);
-            var style = builder.AddFont(14, dfltFontName)
-                .AddAlignmrnt(VerticalAlignment.Center, HorizontalAlignment.Left)
-                .AddForegroundColor(Color.LightGray, tint: 0.5) 
+            var fontStyle = GetStyleByTestType (type);
+            short size = 14;
+
+            if (type == "Script")
+                size = 12;
+
+            var style = builder.AddFont(size, dfltFontName)
+                .AddAlignment(VerticalAlignment.Center, HorizontalAlignment.Left)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
 
             return style;
@@ -120,21 +134,23 @@ namespace TestRuns.Utilities
             return style;
         }
 
-        public XSSFCellStyle GetTotalTestsStyle()
+        public XSSFCellStyle GetTotalTestsStyle(string type = null)
         {
+            var fontStyle = GetStyleByTestType(type);
             var builder = new ExcelStyleBuilder(book);
             var style = builder.AddFont(14, dfltFontName)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
 
             return style;
         }
 
-        public XSSFCellStyle GetTotalPassedStyle()
+        public XSSFCellStyle GetTotalPassedStyle(string type = null)
         {
             var builder = new ExcelStyleBuilder(book);
+            var fontStyle = GetStyleByTestType(type);
             var style = builder.AddFont(14, dfltFontName, Color.Green)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
 
             return style;
@@ -149,31 +165,34 @@ namespace TestRuns.Utilities
             return style;
         }
 
-        public XSSFCellStyle GetTotalNotExecStyle()
+        public XSSFCellStyle GetTotalNotExecStyle(string type = null)
         {
             var builder = new ExcelStyleBuilder(book);
+            var fontStyle = GetStyleByTestType(type);
             var style = builder.AddFont(14, dfltFontName, Color.Gray)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
 
             return style;
         }
 
-        public XSSFCellStyle GetTotalFailedStyle()
+        public XSSFCellStyle GetTotalFailedStyle(string type = null)
         {
             var builder = new ExcelStyleBuilder(book);
+            var fontStyle = GetStyleByTestType(type);
             var style = builder.AddFont(14, dfltFontName, Color.DarkRed)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
 
             return style;
         }
 
-        public XSSFCellStyle GetTotalProcentStyle()
+        public XSSFCellStyle GetTotalProcentStyle(string type = null)
         {
             var builder = new ExcelStyleBuilder(book);
+            var fontStyle = GetStyleByTestType(type);
             var style = builder.AddFont(14, dfltFontName, Color.Green)
-                .AddForegroundColor(Color.LightGray, tint: 0.5)
+                .AddForegroundColor(fontStyle.color, tint: fontStyle._tint)
                 .Build();
             style.SetDataFormat(GetProcentFormat());
 
@@ -188,6 +207,33 @@ namespace TestRuns.Utilities
             style.SetDataFormat(GetProcentFormat());
 
             return style;
+        }
+
+        public (Color color, double _tint) GetStyleByTestType(string type)
+        {
+            Color color = Color.LightGray;
+            double _tint = 0.5;
+
+            if (type != null)
+            {
+                switch (type)
+                {
+                    case "UI":
+                        color = Color.LightGray;
+                        _tint = 0;
+                        break;
+                    case "API":
+                        color = Color.Gray;
+                        _tint = 0.8;
+                        break;
+                    case "Script":
+                        color = Color.LightGray;
+                        _tint = 0.8;
+                        break;
+                }
+            }
+
+            return (color, _tint);
         }
 
         private int GetProcentFormat()
