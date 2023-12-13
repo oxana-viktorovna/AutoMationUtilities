@@ -45,7 +45,7 @@ namespace SharedCore.FileUtilities.Excel
             return this;
         }
 
-        public ExcelStyleBuilder AddAlignmrnt(VerticalAlignment? vertical = null, HorizontalAlignment? horizontal = null)
+        public ExcelStyleBuilder AddAlignment(VerticalAlignment? vertical = null, HorizontalAlignment? horizontal = null)
         {
             vertical ??= VerticalAlignment.Center;
             style.VerticalAlignment = (VerticalAlignment)vertical;

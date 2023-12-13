@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.OpenXmlFormats.Dml.WordProcessing;
+using NPOI.SS.UserModel;
 using SharedCore.FileUtilities.Excel;
 using TestRuns.Models;
 using TestRuns.Steps;
@@ -33,15 +34,15 @@ namespace TestRuns.Utilities
 
             sumSheet = book.CreateSheet("Summary");
             
-            CreateHeaders(runDurection);
+            CreateHeaders();
             GenerateAllSectionsRows(runs);
-            CreateMainTotals();
+            CreateMainTotals(runDurection);
         }
 
         private void GenerateRowsNumbers(IEnumerable<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)> runs)
         {
-            var uiRuns = runs.Where(run => run.testType == TestType.Ui);
-            var apiRuns = runs.Where(run => run.testType == TestType.Api);
+            var uiRuns = runs.Where(run => run.testType == TestType.UI);
+            var apiRuns = runs.Where(run => run.testType == TestType.API);
             var scriptRuns = runs.Where(run => run.testType == TestType.Script);
             GenerateRowsNumbers(uiRuns.Count(), apiRuns.Count(), scriptRuns.Count());
         }
@@ -61,26 +62,39 @@ namespace TestRuns.Utilities
             scriptRowsNums.RunRowsLastNum = scriptRowsNums.SumRowNum + scriptRuns;
         }
 
-        private void CreateHeaders(string runDurection)
+        private void CreateHeaders()
         {
             var headerRow = sumSheet.CreateRow(0);
             var style = stylesBuilder.GetHeaderStyle();
-            headerRow.CreateCell(0, "", style);
-            headerRow.CreateCell(1, $"Run duration: {runDurection}", style);
-            headerRow.CreateCell(2, "Total Tests", style);
-            headerRow.CreateCell(3, "Passed", style);
-            headerRow.CreateCell(4, "Not Executed", style);
-            headerRow.CreateCell(5, "Failed", style);
-            headerRow.CreateCell(6, "Pass percentage", style);
+            var sideBarStyle = stylesBuilder.GetSideBarStyle();
+            sideBarStyle.Rotation = (short)90;
+
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(0, 4, 0, 0));
+
+            headerRow.CreateCell(0, "TOTALS", sideBarStyle);
+            headerRow.CreateCell(1, "", style);
+            headerRow.CreateCell(2, "TOTAL", style);
+            headerRow.CreateCell(3, "PASSED", style);
+            headerRow.CreateCell(4, "NOT EXEC", style);
+            headerRow.CreateCell(5, "FAILED", style);
+            headerRow.CreateCell(6, "PASS percentage", style);
         }
 
-        private void CreateMainTotals()
+        private void CreateMainTotals(string runDurection)
         {
             var rowNum = 1;
             var firstRow = sumSheet.CreateRow(rowNum);
+            var simpleStyle = stylesBuilder.GetSimpleWrapStyle();
+            simpleStyle.WrapText = true;
 
-            var sideBarStyle = stylesBuilder.GetSideBarStyle();
-            firstRow.CreateCell(0, "Totals", sideBarStyle);
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 1, 1, 1));
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 2, 2, 2));
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 2, 3, 3));
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 2, 4, 4));
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 2, 5, 5));
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowNum, rowNum + 2, 6, 6));
+
+            firstRow.CreateCell(1, $"Run duration: {runDurection}", simpleStyle);
 
             var totalTestsMainStyle = stylesBuilder.GetTotalTestsMainStyle();
             firstRow.CreateCellWithFormula(2, $"SUM(D{rowNum + 1}:F{rowNum + 1})", totalTestsMainStyle);
@@ -104,14 +118,14 @@ namespace TestRuns.Utilities
 
         public void GenerateAllSectionsRows(IEnumerable<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)> runs)
         {
-            var uiRuns = runs.Where(run => run.testType == TestType.Ui);
-            var apiRuns = runs.Where(run => run.testType == TestType.Api);
+            var uiRuns = runs.Where(run => run.testType == TestType.UI);
+            var apiRuns = runs.Where(run => run.testType == TestType.API);
             var scriptRuns = runs.Where(run => run.testType == TestType.Script);
 
-            var uiRowsNums = GetRowsNums(TestType.Ui);
+            var uiRowsNums = GetRowsNums(TestType.UI);
             CreateSectionRows(uiRuns, uiRowsNums);
 
-            var apiRowsNums = GetRowsNums(TestType.Api);
+            var apiRowsNums = GetRowsNums(TestType.API);
             CreateSectionRows(apiRuns, apiRowsNums);
 
             var scriptRowsNums = GetRowsNums(TestType.Script);
@@ -122,8 +136,8 @@ namespace TestRuns.Utilities
         {
             return testType switch
             {
-                TestType.Ui => uiRowsNums,
-                TestType.Api => apiRowsNums,
+                TestType.UI => uiRowsNums,
+                TestType.API => apiRowsNums,
                 TestType.Script => scriptRowsNums,
                 _ => throw new NotSupportedException($"Test type {testType} is not supported"),
             };
@@ -135,6 +149,7 @@ namespace TestRuns.Utilities
             var origRunCount = 0;
 
             var i = rowNums.RunRowsFirstNum;
+            int k = 0;
             foreach (var run in runs)
             {
                 var isCreated = CreateRunRow((run.build, run.summary), i);
@@ -142,25 +157,32 @@ namespace TestRuns.Utilities
                     origRunCount++;
 
                 i++;
+                k++;
             }
 
-            GreateSectionTotalsRow(testType, rowNums, origRunCount);
-
-            if (testType == TestType.Ui)
+            if (testType == TestType.UI)
+            {
                 CreateLocalRunRow(rowNums.RunRowsLastNum);
+                k++;
+            }
+
+            CreateSectionTotalsRow(testType, rowNums, origRunCount, k);
+            
         }
 
-        private void GreateSectionTotalsRow(TestType testType, SummaryReportSectionRowsNums rowsNums, int origRunCount)
-        {
-            var sideBarStyle = stylesBuilder.GetSideBarWithForeGroundStyle();
-            var totalTestsStyle = stylesBuilder.GetTotalTestsStyle();
-            var totalTestsMainStyle = stylesBuilder.GetTotalTestsStyle();
-            var totalPassedMainStyle = stylesBuilder.GetTotalPassedStyle();
-            var totalNotExecMainStyle = stylesBuilder.GetTotalNotExecStyle();
-            var totalFailedMainStyle = stylesBuilder.GetTotalFailedStyle();
-            var totalProcentMainStyle = stylesBuilder.GetTotalProcentStyle();
+        private void CreateSectionTotalsRow(TestType testType, SummaryReportSectionRowsNums rowsNums, int origRunCount, int mergeCount)
+        {           
+            var sideBarStyle = stylesBuilder.GetSideBarWithForeGroundStyle(testType.ToString());
+            sideBarStyle.Rotation = (short)90;
+            var totalTestsStyle = stylesBuilder.GetTotalTestsStyle(testType.ToString());
+            var totalTestsMainStyle = stylesBuilder.GetTotalTestsStyle(testType.ToString());
+            var totalPassedMainStyle = stylesBuilder.GetTotalPassedStyle(testType.ToString());
+            var totalNotExecMainStyle = stylesBuilder.GetTotalNotExecStyle(testType.ToString());
+            var totalFailedMainStyle = stylesBuilder.GetTotalFailedStyle(testType.ToString());
+            var totalProcentMainStyle = stylesBuilder.GetTotalProcentStyle(testType.ToString());
 
             var row = sumSheet.CreateRow(rowsNums.SumRowNum);
+            sumSheet.AddMergedRegion(new NPOI.SS.Util.CellRangeAddress(rowsNums.SumRowNum, rowsNums.SumRowNum + mergeCount, 0, 0));
 
             row.CreateCell(0, testType.ToString(), sideBarStyle);
             row.CreateCell(1, "", totalTestsStyle);
@@ -196,10 +218,9 @@ namespace TestRuns.Utilities
 
         private string GetRunRowTitle(int buildId, bool isOrig)
         {
-            var env = buildApiSteps.GetBuildEnv(buildId);
             var titleRunPart = isOrig ? "Run" : "Re-Run";
 
-            return $"{titleRunPart} {env}";
+            return $"{titleRunPart}";
         }
 
         private string GetBuildLink(int buildId)
@@ -218,8 +239,8 @@ namespace TestRuns.Utilities
 
     public enum TestType
     {
-        Ui,
-        Api,
+        UI,
+        API,
         Script
     }
 }

@@ -47,8 +47,8 @@ namespace TestRuns.Steps
 
             var stat = new List<(TestType testType, (int id, bool isOrig) build, RunSummary runSummary)>()
             { 
-                (TestType.Ui, (buildId, isOrig), uiSummary),
-                (TestType.Api, (buildId, isOrig), apiSummary)
+                (TestType.UI, (buildId, isOrig), uiSummary),
+                (TestType.API, (buildId, isOrig), apiSummary)
             };
 
             return stat;
