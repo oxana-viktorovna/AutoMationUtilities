@@ -1,6 +1,7 @@
 ﻿using ADOCore.Models;
 using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace ADOCore.ApiClients
@@ -58,6 +59,35 @@ namespace ADOCore.ApiClients
                 updateTestStatus};
 
             return SendAdoPatchRequest($"wit/workitems/{workItemId}", body, "application/json-patch+json");
+        }
+
+        public IRestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds, int rev)
+        {
+            var body = new List<object>();
+            var updateRoot = new RootUpdateWorkItem()
+            {
+                Op = "test",
+                Path = "/rev",
+                Value = rev
+            };
+            body.Add(updateRoot);
+            foreach (var linkId in linkIds)
+            {
+                var update = new UpdateWorkItem()
+                {
+                    Op = "add",
+                    Path = "/relations/-",
+                    Value = new
+                    {
+                        rel = "Microsoft.VSTS.Common.TestedBy-Forward",
+                        url = $"{baseUrl}/wit/workItems/{linkId}",
+                        attributes = new { comment = "Tested by" }
+                    }
+                };
+                body.Add(update);
+            }
+
+            return SendAdoPatchRequest($"wit/workitems/{workItemId}", body.ToArray(), "application/json-patch+json");
         }
     }
 }

@@ -25,5 +25,11 @@ namespace TestRuns.Steps
             var item = GetWorkItem(workItemId);
             return client.UpdateAutomationAssociation(workItemId, fullTestName, item.rev);
         }
+
+        public IRestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
+        {
+            var item = GetWorkItem(workItemId);
+            return client.AddTestedByLinksToWorkItem(workItemId, linkIds, item.rev);
+        }
     }
 }

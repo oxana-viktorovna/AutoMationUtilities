@@ -13,9 +13,11 @@ namespace ADOCore.ApiClients
                 Authenticator = new HttpBasicAuthenticator("", adoSettings.Password),
                 Timeout = -1
             };
+            baseUrl = adoSettings.BaseUrl;
         }
 
         protected readonly RestClient client;
+        protected readonly string baseUrl;
 
         protected IRestResponse SendAdoRequest(
             string resource,
@@ -38,7 +40,6 @@ namespace ADOCore.ApiClients
             string version = "6.0")
         {
             var request = BuildPatchRequest(resource, body, contentType, version);
-            var n = request.ToString();
             var response = client.Execute(request);
 
             return response;

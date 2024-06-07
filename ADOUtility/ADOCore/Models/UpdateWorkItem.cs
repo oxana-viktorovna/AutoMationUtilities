@@ -17,6 +17,6 @@ namespace ADOCore.Models
     {
         public string Op { get; set; }
         public string Path { get; set; }
-        public string Value { get; set; }
+        public object Value { get; set; }
     }
 }
