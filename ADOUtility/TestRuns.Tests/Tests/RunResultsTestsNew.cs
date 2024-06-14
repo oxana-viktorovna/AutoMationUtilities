@@ -8,7 +8,7 @@ using TestRuns.Models;
 using TestRuns.Steps;
 using TestRuns.Utilities;
 
-namespace TestRuns
+namespace TestRuns.Tests
 {
     [TestClass]
     public class RunResultsTestsNew

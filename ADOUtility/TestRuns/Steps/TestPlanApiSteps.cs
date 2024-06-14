@@ -21,14 +21,28 @@ namespace TestRuns.Steps
         public string GetRunIdForSuite(int suiteId)
             => client.GetRunsForSuite(suiteId);
 
-        public IEnumerable<int> GetSuiteFailedTestPoint(int testPlanId, int suiteId)
+        public IEnumerable<int> GetSuiteFailedTestIds(int testPlanId, int suiteId)
+        {
+            var failed = GetSuiteFailedTestPoint(testPlanId, suiteId);
+            var failedIds = failed.Select(testPoint => testPoint.testCaseReference.id);
+
+            return failedIds;
+        }
+
+        public IEnumerable<int> GetSuiteFailedTestRunIds(int testPlanId, int suiteId)
+        {
+            var failed = GetSuiteFailedTestPoint(testPlanId, suiteId);
+            var runIds = failed.Select(testPoint => testPoint.results.lastTestRunId);
+
+            return runIds;
+        }
+
+        private IEnumerable<TestPoint> GetSuiteFailedTestPoint(int testPlanId, int suiteId)
         {
             var response = client.GetSuiteTestPoints(testPlanId, suiteId);
             var failed = response.Where(testPoint => testPoint.results.outcome == "failed");
-            var failedIds = failed.Select(testPoint => testPoint.testCaseReference.id);
-            var count = failedIds.Count();
 
-            return failedIds;
+            return failed;
         }
     }
 }

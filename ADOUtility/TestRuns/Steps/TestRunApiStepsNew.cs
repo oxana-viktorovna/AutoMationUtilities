@@ -213,21 +213,33 @@ namespace TestRuns.Steps
 
             var buildName = buildApiSteps.GetBuildEnv(buildId);
             var runInfos = GetRunInfo(buildId);
+
+            return GetTrxAttachments(runInfos);
+        }
+
+        public List<TestRunUnitTestResult> GetTrxAttachments(List<RunInfo> runInfos)
+        {
             var runAttchmentsInfos = GetRunAttchmentsInfo(runInfos);
             var runAttchmentsIds = GetAttchsIdsByType(runAttchmentsInfos, ".trx");
             var testRunTrxAttachments = GetTestRunTrxAttachments(runAttchmentsIds);
             var testRunResults = testRunTrxAttachments.Where(trx => trx.testRunAttach != null && trx.testRunAttach.Results != null).SelectMany(trx => {
                 var results = trx.testRunAttach.Results;
-                 foreach (var result in results)
-                    {
-                        result.RunName = trx.runName;
-                        result.Env = buildName;
-                    }
+                foreach (var result in results)
+                {
+                    result.RunName = trx.runName;
+                }
 
                 return results;
             });
 
-            return testRunResults == null ? null : testRunResults.ToList();
+            return testRunResults?.ToList();
+        }
+
+        public List<RunInfo> GetRunInfo(IEnumerable<int> runIds)
+        {
+            var runInfos = testRunApiClient.GetRunInfo(runIds);
+
+            return runInfos;
         }
 
         private List<(string runName,TestRun testRunAttach)> GetTestRunTrxAttachments(IEnumerable<(RunInfo runInfo, int attchId)> ids)
@@ -236,8 +248,6 @@ namespace TestRuns.Steps
         private List<(RunInfo runInfo, AttachmentsInfo attchInfos)> GetRunAttchmentsInfo(List<RunInfo> runInfos)
             => runInfos.Select(runInfo => (runInfo, testRunApiClient.GetAttachmentsInfo(runInfo.id))).ToList();
 
-        private List<RunInfo> GetRunInfo(params List<int>[] buildsIds)
-            => buildsIds.SelectMany(buildsId => buildsId.SelectMany(buildId => GetRunInfo(buildId))).ToList();
 
         private List<RunInfo> GetRunInfo(int buildId)
         {

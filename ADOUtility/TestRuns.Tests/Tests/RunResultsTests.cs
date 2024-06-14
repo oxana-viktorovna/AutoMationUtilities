@@ -1,18 +1,16 @@
 ﻿using ADOCore;
 using ADOCore.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NPOI.SS.Formula.Functions;
 using SharedCore.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using TestRuns.Models;
 using TestRuns.Steps;
 using TestRuns.Utilities;
 
-namespace TestRuns
+namespace TestRuns.Tests
 {
     [TestClass]
     public class RunResultsTests
@@ -94,9 +92,7 @@ namespace TestRuns
             var uiFailedTests = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns)
                 .GetNotPassedResults();
 
-            var uiFailedTestsWithComments = apiStepsNew.CopyCommentsForBlocked(uiFailedTests, testSettings.SaveFolder);
-
-            uiReportBuilder.CreateFullFailedUiReport(uiFailedTestsWithComments);
+            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(uiFailedTests));
 
             reportBuilder.SaveReport();
         }
