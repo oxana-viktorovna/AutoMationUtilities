@@ -1,5 +1,6 @@
 ﻿using ADOCore;
 using ADOCore.ApiClietns;
+using ADOCore.Models;
 using Statistic.Query;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,10 @@ namespace Statistic.Steps
             baseQueryBuilder = new WorkItemQueryBuilder()
                .AddAttributesToGet("[System.Id]")
                .AddAttributesToGet("[System.Title]")
+               .AddAttributesToGet("[System.AreaPath]")
+               .AddAttributesToGet("[TR.Elite.AutomatedBy]")
                .AddConditions("[System.TeamProject] = @project")
                .AddConditions("AND [System.WorkItemType] = 'Test Case'")
-               .AddConditions("AND [System.State] <> 'Closed'")
                .AddAreaPathConditions(areaPathes, true);
             wiqlApiClient = new WiqlApiClient(adoSettings);
             this.asOf = asOf;
@@ -27,6 +29,22 @@ namespace Statistic.Steps
         private readonly WorkItemQueryBuilder baseQueryBuilder;
         private readonly WiqlApiClient wiqlApiClient;
         private readonly DateTime? asOf;
+
+
+
+        internal Workitem[] Get255scopeAutomatedTests()
+        {
+            var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
+            var query = builder
+                .AddAutomationStatusCondition("Automated", "=")
+                .AddSingleCondition("System.Tags", "255scope", "contains", "AND")
+                .AddAsOf(asOf)
+                .Build();
+
+            var queryResult = wiqlApiClient.PostWiqlQuery(query);
+
+            return queryResult.workItems;
+        }
 
         internal int GetAutomatedTestCountByPriority(int priority)
         {
@@ -73,6 +91,7 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
+                .AddConditions("AND [System.State] <> 'Closed'")
                 .AddAutomationStatusCondition("Automated", "=")
                 .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "=")
                 .AddInPriorityCondition(priorities)
@@ -88,6 +107,7 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
+                .AddConditions("AND [System.State] <> 'Closed'")
                 .AddSinglePriorityCondition(priority, "=")
                 .AddAsOf(asOf)
                 .Build();
@@ -101,6 +121,7 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
+                .AddConditions("AND [System.State] <> 'Closed'")
                 .AddInPriorityCondition(priorities)
                 .AddAsOf(asOf)
                 .Build();

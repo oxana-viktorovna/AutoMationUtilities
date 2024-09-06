@@ -33,7 +33,7 @@ namespace TestRuns.Tests
         public void GetSuiteFailedTests()
         {
             var testPlanId = 199475;
-            var suiteId = 276565;// 265004 ui, 264947 nonp, 264926 blocked, 267032 analytics
+            var suiteId = 271705;// 265004 ui, 264947 nonp, 264926 blocked, 267032 analytics
             var testsIds = apiSteps.GetSuiteNotPassedTestIds(testPlanId, suiteId);
 
             Assert.Inconclusive(string.Join(",", testsIds));
@@ -46,14 +46,31 @@ namespace TestRuns.Tests
             var testsIdsUI = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 265004);
             var testsIdsNP = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 264947);
             var testsIdsBlock = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 264926);
-            var testsIdsAnalytics = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 267032);
-            var testsIdsNegativeAnalytics = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 274457);
+            var testsIdsCdw = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 277588);
+            var testsIdsNewRa = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 274457);
             var result = new StringBuilder();
-            result.AppendLine("UI:" + string.Join(",", testsIdsUI));
-            result.AppendLine("Nonparallel:" + string.Join(",", testsIdsNP));
+            result.AppendLine("UI: " + string.Join(",", testsIdsUI));
+            result.AppendLine("Nonparallel: " + string.Join(",", testsIdsNP));
             result.AppendLine("Blocked:" + string.Join(",", testsIdsBlock));
-            result.AppendLine("Analytics:" + string.Join(",", testsIdsAnalytics));
-            result.AppendLine("NGA:" + string.Join(",", testsIdsNegativeAnalytics));
+            result.AppendLine("NGA CoreDW: " + string.Join(",", testsIdsCdw));
+            result.AppendLine("NGA NewRa: " + string.Join(",", testsIdsNewRa));
+
+            Assert.Inconclusive(Environment.NewLine + result.ToString());
+        }
+
+        [TestMethod]
+        public void GetSuiteFailedTestsMajorRelease()
+        {
+            var testPlanId = 199475;
+            var testsIdsFullUs = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271702);
+            var testsIdsFullUk = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271703);
+            var testsIdsNpUs = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271704);
+            var testsIdsNpUk = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271705);
+            var result = new StringBuilder();
+            result.AppendLine("UI UK: " + string.Join(",", testsIdsFullUs));
+            result.AppendLine("UI US: " + string.Join(",", testsIdsFullUk));
+            result.AppendLine("Nonparallel UK: " + string.Join(",", testsIdsNpUs));
+            result.AppendLine("Nonparallel US: " + string.Join(",", testsIdsNpUk));
 
             Assert.Inconclusive(Environment.NewLine + result.ToString());
         }
