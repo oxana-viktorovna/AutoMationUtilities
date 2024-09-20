@@ -15,7 +15,7 @@ namespace ADOCore.ApiClients
 
         public TestSuiteTests GetSuiteTests(int testPlanId, int suiteId)
         {
-            var response = SendAdoRequest($"test/Plans/{testPlanId}/suites/{suiteId}/testcases", Method.GET, version: "5.1");
+            var response = SendAdoRequest($"test/Plans/{testPlanId}/suites/{suiteId}/testcases", Method.Get, version: "5.1");
 
             return JsonSerializer.Deserialize<TestSuiteTests>(response.Content);
         }
@@ -24,7 +24,7 @@ namespace ADOCore.ApiClients
         {
             var param = new List<(string, string)>
             { ("queryOrder", "finishTimeDesc&$top=1&testSuiteId={suiteId}")};
-            var response = SendAdoRequest($"test/runs", Method.GET, param, version: "6.0-preview");
+            var response = SendAdoRequest($"test/runs", Method.Get, param, version: "6.0-preview");
 
             return response.Content;
         }
@@ -51,7 +51,7 @@ namespace ADOCore.ApiClients
             if (!string.IsNullOrEmpty(currentContinuationToken))
                 param.Add(("continuationToken", currentContinuationToken));
             
-            var response = SendAdoRequest(url, Method.GET, param, version: "7.1-preview.2");
+            var response = SendAdoRequest(url, Method.Get, param, version: "7.1-preview.2");
             var content = JsonSerializer.Deserialize<TestPointResponse>(response.Content);
             nextContinuationToken = response.Headers
                                     .Where(header => header.Name.Equals("x-ms-continuationtoken", StringComparison.OrdinalIgnoreCase))

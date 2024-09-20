@@ -13,7 +13,7 @@ namespace ADOCore.ApiClietns
 
         public WorkItemResponce PostWiqlQuery(string query)
         { 
-            var responce = SendAdoRequest("wit/wiql", Method.POST, body: new WiqlQueryRequest(query));
+            var responce = SendAdoRequest("wit/wiql", Method.Post, body: new WiqlQueryRequest(query));
             var content = JsonConvert.DeserializeObject<WorkItemResponce>(responce.Content);
 
             return content;

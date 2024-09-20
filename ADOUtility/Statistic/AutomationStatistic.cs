@@ -46,7 +46,16 @@ namespace Statistic
         }
 
         [TestMethod]
-        public void Get255Scope()
+        public void Get255ScopeTests()
+        {
+            var tests = autoStatSteps.Get255scopeAutomatedTests();
+            var ids = tests.Select(t => t.id);
+
+            Assert.Inconclusive(Environment.NewLine + string.Join(",", ids));
+        }
+
+        [TestMethod]
+        public void Get255ScopeStat()
         {
             var stistic = new StringBuilder("AreaPath \t P0 \t P1");
             stistic.AppendLine();

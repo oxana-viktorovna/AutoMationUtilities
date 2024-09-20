@@ -2,7 +2,6 @@
 using ADOCore.ApiClients;
 using ADOCore.Models;
 using RestSharp;
-using System.Net;
 
 namespace TestRuns.Steps
 {
@@ -17,16 +16,16 @@ namespace TestRuns.Steps
 
         public WorkItem GetWorkItem(int workItemId)
         => workItemId == 0
-            ? null
+            ? default
             : client.GetWorkItem(workItemId);
 
-        public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
+        public RestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
         {
             var item = GetWorkItem(workItemId);
             return client.UpdateAutomationAssociation(workItemId, fullTestName, item.rev);
         }
 
-        public IRestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
+        public RestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
         {
             var item = GetWorkItem(workItemId);
             return client.AddTestedByLinksToWorkItem(workItemId, linkIds, item.rev);

@@ -1,11 +1,10 @@
-﻿using RestSharp;
-using System;
+﻿using ADOCore.ApiClients;
+using ADOCore.Models;
+using RestSharp;
+using SharedCore.FileUtilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using ADOCore.Models;
-using ADOCore.ApiClients;
-using SharedCore.FileUtilities;
 
 namespace ADOCore.ApiClietns
 {
@@ -20,7 +19,7 @@ namespace ADOCore.ApiClietns
 
         public RunInfo GetRunInfo(int runId)
         {
-            var response = SendAdoRequest($"test/Runs/{runId}", Method.GET);
+            var response = SendAdoRequest($"test/Runs/{runId}", Method.Get);
             var runsInfo = JsonSerializer.Deserialize<RunInfo>(response.Content);
 
             return runsInfo;
@@ -28,7 +27,7 @@ namespace ADOCore.ApiClietns
 
         public RunStat GetRunStatistic(int runId)
         {
-            var response = SendAdoRequest($"test/Runs/{runId}/Statistics", Method.GET);
+            var response = SendAdoRequest($"test/Runs/{runId}/Statistics", Method.Get);
 
             if (response.Content.Contains("<!DOCTYPE html>"))
                 return null;
@@ -46,7 +45,7 @@ namespace ADOCore.ApiClietns
             if (runId == 0)
                 return null;
 
-            var response = SendAdoRequest($"test/Runs/{runId}/attachments", Method.GET);
+            var response = SendAdoRequest($"test/Runs/{runId}/attachments", Method.Get);
 
             return JsonSerializer.Deserialize<AttachmentsInfo>(response.Content);
         }
@@ -65,9 +64,9 @@ namespace ADOCore.ApiClietns
             return XmlWorker.DeserializeXmlFromMemoryStream<testsuites>(response.Content);
         }
 
-        private IRestResponse GetAttachement(int runId, int attachmentId)
+        private RestResponse GetAttachement(int runId, int attachmentId)
             => attachmentId == 0 
             ? null 
-            : SendAdoRequest($"test/Runs/{runId}/attachments/{attachmentId}", Method.GET);
+            : SendAdoRequest($"test/Runs/{runId}/attachments/{attachmentId}", Method.Get);
     }
 }

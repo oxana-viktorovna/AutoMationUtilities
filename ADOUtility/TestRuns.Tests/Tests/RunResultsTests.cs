@@ -164,7 +164,7 @@ namespace TestRuns.Tests
         [TestMethod]
         public void GetUiRunDuration()
         {
-            var uiPassedTests = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns).GetPassedResults();
+            var uiPassedTests = apiStepsNew.GetTrxAttachments(testSettings.CurrBuildIds, testSettings.Reruns);//.GetPassedResults();
 
             var shortBuildName = buildApiSteps.GetShortBuildName(testSettings.CurrBuildIds);
             var currFileName = $"{shortBuildName}{testSettings.CurrRunPostffix}_Duration";

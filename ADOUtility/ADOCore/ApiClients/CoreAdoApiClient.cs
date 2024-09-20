@@ -8,20 +8,22 @@ namespace ADOCore.ApiClients
     {
         public CoreAdoApiClient(AdoSettings adoSettings)
         {
-            client = new RestClient(adoSettings.BaseUrl)
+            var options = new RestClientOptions(adoSettings.BaseUrl)
             {
                 Authenticator = new HttpBasicAuthenticator("", adoSettings.Password),
-                Timeout = -1
+                Timeout = System.TimeSpan.FromSeconds(3)
             };
+
+            client = new RestClient(options);
             baseUrl = adoSettings.BaseUrl;
         }
 
         protected readonly RestClient client;
         protected readonly string baseUrl;
 
-        protected IRestResponse SendAdoRequest(
+        protected RestResponse SendAdoRequest(
             string resource,
-            Method method = Method.GET,
+            Method method = Method.Get,
             List<(string name, string value)> parameters = null,
             object body = null,
             string contentType = "application/json",
@@ -33,7 +35,7 @@ namespace ADOCore.ApiClients
             return response;
         }
 
-        protected IRestResponse SendAdoPatchRequest(
+        protected RestResponse SendAdoPatchRequest(
             string resource,
             object body,
             string contentType = "application/json",
@@ -45,9 +47,9 @@ namespace ADOCore.ApiClients
             return response;
         }
 
-        protected IRestResponse<T> SendAdoRequest<T>(
+        protected RestResponse<T> SendAdoRequest<T>(
             string resource,
-            Method method = Method.GET,
+            Method method = Method.Get,
             List<(string name, string value)> parameters = null,
             object body = null,
             string contentType = "application/json",
@@ -59,12 +61,12 @@ namespace ADOCore.ApiClients
             return response;
         }
 
-        private IRestRequest BuildPatchRequest(string resource,
+        private RestRequest BuildPatchRequest(string resource,
             object body,
             string contentType = "application/json",
             string version = "6.0")
         {
-            var request = new RestRequest(resource, Method.PATCH);
+            var request = new RestRequest(resource, Method.Patch);
             request.AddQueryParameter("api-version", version);
             request.AddHeader("Content-Type", contentType);
             request.RequestFormat = DataFormat.Json;
@@ -75,9 +77,9 @@ namespace ADOCore.ApiClients
             return request;
         }
 
-        private IRestRequest BuildRequest(
+        private RestRequest BuildRequest(
             string resource,
-            Method method = Method.GET,
+            Method method = Method.Get,
             List<(string name, string value)> parameters = null,
             object body = null,
             string contentType = "",
@@ -93,7 +95,7 @@ namespace ADOCore.ApiClients
                 }
             }
 
-            if (method != Method.GET && body != null)
+            if (method != Method.Get && body != null)
                 request.AddJsonBody(body, contentType);
 
             return request;
