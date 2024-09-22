@@ -46,12 +46,14 @@ namespace TestRuns.Tests
             var testsIdsUI = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 265004);
             var testsIdsNP = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 264947);
             var testsIdsBlock = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 264926);
+            var testsIdsAnalytics = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 279185);
             var testsIdsCdw = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 277588);
             var testsIdsNewRa = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 274457);
             var result = new StringBuilder();
             result.AppendLine("UI: " + string.Join(",", testsIdsUI));
             result.AppendLine("Nonparallel: " + string.Join(",", testsIdsNP));
             result.AppendLine("Blocked:" + string.Join(",", testsIdsBlock));
+            result.AppendLine("Analytics: " + string.Join(",", testsIdsAnalytics));
             result.AppendLine("NGA CoreDW: " + string.Join(",", testsIdsCdw));
             result.AppendLine("NGA NewRa: " + string.Join(",", testsIdsNewRa));
 
@@ -67,10 +69,10 @@ namespace TestRuns.Tests
             var testsIdsNpUs = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271704);
             var testsIdsNpUk = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 271705);
             var result = new StringBuilder();
-            result.AppendLine("UI UK: " + string.Join(",", testsIdsFullUs));
-            result.AppendLine("UI US: " + string.Join(",", testsIdsFullUk));
-            result.AppendLine("Nonparallel UK: " + string.Join(",", testsIdsNpUs));
-            result.AppendLine("Nonparallel US: " + string.Join(",", testsIdsNpUk));
+            result.AppendLine("UI US: " + string.Join(",", testsIdsFullUs));
+            result.AppendLine("UI UK: " + string.Join(",", testsIdsFullUk));
+            result.AppendLine("Nonparallel US: " + string.Join(",", testsIdsNpUs));
+            result.AppendLine("Nonparallel UK: " + string.Join(",", testsIdsNpUk));
 
             Assert.Inconclusive(Environment.NewLine + result.ToString());
         }
