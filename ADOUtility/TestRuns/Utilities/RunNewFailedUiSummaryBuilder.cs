@@ -41,6 +41,7 @@ namespace TestRuns.Utilities
             headerRow.CreateCell(3, "TestCase N", style);
             headerRow.CreateCell(4, "Test Method", style);
             headerRow.CreateCell(5, "Error", style);
+            headerRow.CreateCell(6, "Area Path", style);
         }
 
         private void CreateFailedUiList(List<ResultReport> testResults)
@@ -58,6 +59,8 @@ namespace TestRuns.Utilities
                 row.CreateCell(3, Convert.ToInt32(string.IsNullOrEmpty(testResults[i].TestCaseNumber) ? "0" : testResults[i].TestCaseNumber), style);
                 row.CreateCell(4, testResults[i].TestMethodName, style);
                 row.CreateCell(5, testResults[i].Error, style);
+                if (testResults[i].AreaPath != null)
+                    row.CreateCell(6, testResults[i].AreaPath, style);
             }
         }
     }

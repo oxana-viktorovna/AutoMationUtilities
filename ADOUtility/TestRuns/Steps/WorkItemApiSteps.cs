@@ -20,6 +20,11 @@ namespace TestRuns.Steps
             ? null
             : client.GetWorkItem(workItemId);
 
+        public WorkItemNew GetWorkItemNew(int workItemId)
+=> workItemId == 0
+    ? null
+    : client.GetWorkItemNew(workItemId);
+
         public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
         {
             var item = GetWorkItem(workItemId);

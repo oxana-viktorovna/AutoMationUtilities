@@ -20,13 +20,31 @@ namespace TestRuns.Models
             Reason = reason;
             Outcome = outcome;
         }
-
+        public ResultReport(
+            int num,
+            string outcome,
+            string reason,
+            string testcase,
+            string testMethod,
+            string error,
+            string areaPath
+            )
+        {
+            Number = num;
+            TestCaseNumber = testcase;
+            TestMethodName = testMethod;
+            Error = "\"" + error.Replace(",", "") + "\"";
+            Reason = reason;
+            Outcome = outcome;
+            AreaPath = areaPath;
+        }
         public int Number { get; set; }
         public string TestCaseNumber { get; set; }
         public string TestMethodName { get; set; }
         public string Error { get; set; }
         public string Reason { get; set; }
         public string Outcome { get; set; }
+        public string AreaPath { get; set; }
     }
 
     public static class ResultReportExtension

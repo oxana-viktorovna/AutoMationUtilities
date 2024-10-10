@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TestRuns.Steps;
 using TestRuns.Utilities;
@@ -33,7 +34,7 @@ namespace TestRuns.Tests
         public void GetSuiteFailedTests()
         {
             var testPlanId = 199475;
-            var suiteId = 271705;// 265004 ui, 264947 nonp, 264926 blocked, 267032 analytics
+            var suiteId = 281104;
             var testsIds = apiSteps.GetSuiteNotPassedTestIds(testPlanId, suiteId);
 
             Assert.Inconclusive(string.Join(",", testsIds));
@@ -78,18 +79,38 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void GetSuiteFailedTestResults()
+        public void GetSuiteFailedTestsMinorRelease()
         {
             var testPlanId = 199475;
-            var suiteId = 265004;
+            var testsIdsFullUs = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 266785);
+            var testsIdsFullUk = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 266783);
+            var testsIdsNpUs = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 266787);
+            var testsIdsNpUk = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 266788);
+            var result = new StringBuilder();
+            result.AppendLine("UI US: " + string.Join(",", testsIdsFullUs));
+            result.AppendLine("UI UK: " + string.Join(",", testsIdsFullUk));
+            result.AppendLine("Nonparallel US: " + string.Join(",", testsIdsNpUs));
+            result.AppendLine("Nonparallel UK: " + string.Join(",", testsIdsNpUk));
 
-            var failedRunIds = apiSteps.GetSuiteNotPassedTestRunIds(testPlanId, suiteId);
-            var failedRunInfos = testRunApiStepsNew.GetRunInfo(failedRunIds);
-            var failedTestsResults = testRunApiStepsNew.GetTrxAttachments(failedRunInfos).GetNotPassedResults();
+            Assert.Inconclusive(Environment.NewLine + result.ToString());
+        }
 
-            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, $"Results_TestPlan{testPlanId}TesSuite{suiteId}_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}");
+        [TestMethod]
+        public void GetSuiteFailedTestResults()
+        {
+            var runId = 3428025; // Go to pipeline stage. Check id in the end of the log for 'UI Test Run' task. E.g. 'Test run id: 3424019'
+            var testPlanId = 199475;
+            var suiteId = 281104;
+            var suitetestsIds = apiSteps.GetSuiteNotPassedTestIds(testPlanId, suiteId);
+
+            var adoSettingsReader = new SettingsReader("ADOconfig.json");
+            var adoSettings = new AdoSettings(adoSettingsReader);
+            var apiStepsNew = new TestRunApiStepsNew(adoSettings);
+            var allTestResults = apiStepsNew.GetTrxAttachmentsByRunId(runId);
+
+            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, $"Results_TestPlan{testPlanId}TesSuite{suiteId}RunId{runId}_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}");
             var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
-            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.Convert(failedTestsResults));
+            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.ConvertAxe(allTestResults.ToList(), new WorkItemApiSteps(adoSettings)));
             reportBuilder.SaveReport();
         }
     }

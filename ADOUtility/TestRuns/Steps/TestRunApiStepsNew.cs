@@ -212,10 +212,18 @@ namespace TestRuns.Steps
         {
 
             var buildName = buildApiSteps.GetBuildEnv(buildId);
-            var runInfos = GetRunInfo(buildId);
+            var runInfos = GetRunInfos(buildId);
 
             return GetTrxAttachments(runInfos);
         }
+
+        public List<TestRunUnitTestResult> GetTrxAttachmentsByRunId(int runId)
+        {
+            var runInfo = GetRunInfo(runId);
+
+            return GetTrxAttachments(new List<RunInfo> { runInfo });
+        }
+
 
         public List<TestRunUnitTestResult> GetTrxAttachments(List<RunInfo> runInfos)
         {
@@ -249,7 +257,11 @@ namespace TestRuns.Steps
             => runInfos.Select(runInfo => (runInfo, testRunApiClient.GetAttachmentsInfo(runInfo.id))).ToList();
 
 
-        private List<RunInfo> GetRunInfo(int buildId)
+
+        private RunInfo GetRunInfo(int runId)
+            => testRunApiClient.GetRunInfo(runId);
+
+        private List<RunInfo> GetRunInfos(int buildId)
         {
             var runIds = testResultDetailApiClient.GetRunIds(buildId);
             var runInfos = testRunApiClient.GetRunInfo(runIds);
