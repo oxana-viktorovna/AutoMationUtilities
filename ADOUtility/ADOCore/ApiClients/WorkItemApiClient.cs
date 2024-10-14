@@ -86,9 +86,9 @@ namespace ADOCore.ApiClients
                     Path = "/relations/-",
                     Value = new
                     {
-                        rel = "Microsoft.VSTS.Common.TestedBy-Forward",
+                        rel = "System.LinkTypes.Related",
                         url = $"{baseUrl}/wit/workItems/{linkId}",
-                        attributes = new { comment = "Tested by" }
+                        attributes = new { comment = "Related" }
                     }
                 };
                 body.Add(update);
