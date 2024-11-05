@@ -50,6 +50,7 @@ namespace TestRuns.Tests
             var testsIdsAnalytics = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 279185);
             var testsIdsCdw = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 277588);
             var testsIdsNewRa = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 274457);
+            var testsIdsAxe = apiSteps.GetSuiteNotPassedTestIds(testPlanId, 278993);
             var result = new StringBuilder();
             result.AppendLine("UI: " + string.Join(",", testsIdsUI));
             result.AppendLine("Nonparallel: " + string.Join(",", testsIdsNP));
@@ -57,6 +58,7 @@ namespace TestRuns.Tests
             result.AppendLine("Analytics: " + string.Join(",", testsIdsAnalytics));
             result.AppendLine("NGA CoreDW: " + string.Join(",", testsIdsCdw));
             result.AppendLine("NGA NewRa: " + string.Join(",", testsIdsNewRa));
+            result.AppendLine("Axe: " + string.Join(",", testsIdsAxe));
 
             Assert.Inconclusive(Environment.NewLine + result.ToString());
         }
