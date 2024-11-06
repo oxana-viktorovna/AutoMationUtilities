@@ -20,8 +20,7 @@ namespace Statistic.Steps
                .AddAttributesToGet("[System.AreaPath]")
                .AddAttributesToGet("[TR.Elite.AutomatedBy]")
                .AddConditions("[System.TeamProject] = @project")
-               .AddConditions("AND [System.WorkItemType] = 'Test Case'")
-               .AddAreaPathConditions(areaPathes, true);
+               .AddConditions("AND [System.WorkItemType] = 'Test Case'");
             wiqlApiClient = new WiqlApiClient(adoSettings);
             this.asOf = asOf;
         }
@@ -44,21 +43,6 @@ namespace Statistic.Steps
             var queryResult = wiqlApiClient.PostWiqlQuery(query);
 
             return queryResult.workItems;
-        }
-
-        internal int GetAutomatedTestCountByPriority(int priority)
-        {
-            var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
-            var query = builder
-                .AddAutomationStatusCondition("Automated", "=")
-                .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "=")
-                .AddSinglePriorityCondition(priority, "=")
-                .AddAsOf(asOf)
-                .Build();
-
-            var queryResult = wiqlApiClient.PostWiqlQuery(query);
-
-            return queryResult.workItems.Length;
         }
 
         public int GetNumTests(string areaPath, string tag, int? priority, bool automated = false)
@@ -87,14 +71,28 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
+        internal int GetAutomatedTestCountByPriority(int priority)
+        {
+            var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
+            var query = builder
+                .AddAutomatedTestsCondition()
+                .AddSinglePriorityCondition(priority, "=")
+                .AddTitleCondition("a11y", "CONTAINS", "AND NOT")
+                .AddAsOf(asOf)
+                .Build();
+
+            var queryResult = wiqlApiClient.PostWiqlQuery(query);
+
+            return queryResult.workItems.Length;
+        }
+
         internal int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
-                .AddConditions("AND [System.State] <> 'Closed'")
-                .AddAutomationStatusCondition("Automated", "=")
-                .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "=")
+                .AddAutomatedTestsCondition()
                 .AddInPriorityCondition(priorities)
+                .AddTitleCondition("a11y", "CONTAINS", "AND NOT")
                 .AddAsOf(asOf)
                 .Build();
 
@@ -107,8 +105,9 @@ namespace Statistic.Steps
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
-                .AddConditions("AND [System.State] <> 'Closed'")
+                .AddStateCondition("Closed", "<>")
                 .AddSinglePriorityCondition(priority, "=")
+                .AddTitleCondition("a11y", "CONTAINS", "AND NOT")
                 .AddAsOf(asOf)
                 .Build();
 

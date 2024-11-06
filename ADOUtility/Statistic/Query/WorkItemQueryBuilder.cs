@@ -16,7 +16,7 @@ namespace Statistic.Query
 
         internal WorkItemQueryBuilder AddAsOf(DateTime? date)
         {
-            if(date != null)
+            if (date != null)
                 query.Conditions.Add($"asOf '{date:yyyy-MM-ddTHH:mm:ss.fff}'");
 
             return this;
@@ -50,28 +50,28 @@ namespace Statistic.Query
             return this;
         }
 
-        internal WorkItemQueryBuilder AddAreaPathConditions(IEnumerable<string> areaPathes, bool toInclude)
-        {
-            if(areaPathes == null || !areaPathes.Any())
-                return this;
-
-            var conjunction = toInclude ? "OR" : "AND NOT";
-            query.Conditions.Add($"AND ([System.AreaPath] UNDER {string.Join($" {conjunction} [System.AreaPath] UNDER ", areaPathes.Select(ap => $"'{ap}'"))}) ");
-
-            return this;
-        }
+        internal WorkItemQueryBuilder AddAutomatedTestsCondition()
+            => AddAutomationStatusCondition("Automated", "=")
+                .AddAutomatedTestStorageCondition("Tracker.Testing.Automation.Tests.dll", "=")
+                .AddStateCondition("Closed", "<>");
 
         internal WorkItemQueryBuilder AddSinglePriorityCondition(int priority, string comparisonOperator, string conjunction = "AND")
             => AddSingleCondition("Microsoft.VSTS.Common.Priority", priority, comparisonOperator, conjunction);
 
         internal WorkItemQueryBuilder AddInPriorityCondition(IEnumerable<int> priorities, string conjunction = "AND")
-        => AddSingleCondition("Microsoft.VSTS.Common.Priority", priorities, "IN", conjunction);
+            => AddSingleCondition("Microsoft.VSTS.Common.Priority", priorities, "IN", conjunction);
 
         internal WorkItemQueryBuilder AddAutomatedTestStorageCondition(string value, string comparisonOperator, string conjunction = "AND")
             => AddSingleCondition("Microsoft.VSTS.TCM.AutomatedTestStorage", value, comparisonOperator, conjunction);
 
         internal WorkItemQueryBuilder AddAutomationStatusCondition(string automatedStatus, string comparisonOperator, string conjunction = "AND")
             => AddSingleCondition("Microsoft.VSTS.TCM.AutomationStatus", automatedStatus, comparisonOperator, conjunction);
+
+        internal WorkItemQueryBuilder AddTitleCondition(string title, string comparisonOperator, string conjunction = "AND")
+            => AddSingleCondition("System.Title", title, comparisonOperator, conjunction);
+
+        internal WorkItemQueryBuilder AddStateCondition(string state, string comparisonOperator, string conjunction = "AND")
+            => AddSingleCondition("System.State", state, comparisonOperator, conjunction);
 
         internal WorkItemQueryBuilder AddSingleCondition(string parameter, string value, string comparisonOperator, string conjunction)
         {

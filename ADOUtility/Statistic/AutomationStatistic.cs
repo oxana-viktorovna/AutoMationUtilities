@@ -30,14 +30,14 @@ namespace Statistic
         private List<string> defaultAreaPathes;
 
         [TestMethod]
-        public void GetAutoTestCoverage()
+        public void GetUIAutoTestCoverage()
         {
             var otherPriorities = new List<int> { 2, 3, 4 };
             var rawStat = new List<(string priority, int autoCount, int allCount)>
             {
                 ("0", autoStatSteps.GetAutomatedTestCountByPriority(0), autoStatSteps.GetTestCountByPriority(0)),
                 ("1", autoStatSteps.GetAutomatedTestCountByPriority(1), autoStatSteps.GetTestCountByPriority(1)),
-                ("2+", autoStatSteps.GetAutomatedTestCountByPriority(otherPriorities), autoStatSteps.GetTestCountByPriority(otherPriorities))
+                ("2+", autoStatSteps.GetAutomatedTestCountByPriority(new List<int> { 2, 3, 4 }), autoStatSteps.GetTestCountByPriority(2) + autoStatSteps.GetTestCountByPriority(new List<int> { 3, 4 }))
             };
 
             Assert.Inconclusive(Environment.NewLine + "All automated " + rawStat.Sum(stat => stat.autoCount) + " All test cases " + rawStat.Sum(stat => stat.allCount) +

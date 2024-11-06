@@ -31,34 +31,10 @@ namespace TestRuns.Tests
         {
             var fullTestNames = new List<string>()
             {
-                "Tracker.Testing.Automation.Tests.Tests.Accessibility.HomePage_AxeTests.T278907_Axe_HomePage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.MasterFirm_AxeTests.T278844_Axe_MasterFirmInfo",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.MasterFirm_AxeTests.T278932_Axe_MasterFirmOfficeInfo",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.MasterFirm_AxeTests.T278833_Axe_MasterFirmEdit",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.MasterFirm_AxeTests.T278943_Axe_MasterFirmOfficeEdit",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.MasterFirm_AxeTests.T279953_Axe_MasterFirmAuditHistory",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Timekeepers.OCEEvaluation_AxeTests.T279280_Axe_FirmEvaluation_Request",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Timekeepers.OCESetup_AxeTests.T279028_Axe_OCESetup_Index",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Timekeepers.OCESetup_AxeTests.T279036_Axe_OCESetup_Preview",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Timekeepers.OCESetup_AxeTests.T279037_Axe_OCESetup_Edit",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Timekeepers.TkprRatesheet_AxeTests.T278838_Axe_TkprRatesheet",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Search.QuickSearch_AxeTests.T279805_Axe_QuickSearchPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Reports.Reports_AxeTests.T278974_Axe_ReportListPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Reports.Reports_AxeTests.T278977_Axe_ReportBuilderPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Reports.Reports_AxeTests.T278978_Axe_ReportEnginesPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Matters.MatterList_AxeTests.T278866_Axe_MatterListingPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Matters.Matter_AxeTests.T279563_Axe_MatterInfoPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Matters.Matter_AxeTests.T279716_Axe_MatterOptionsPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Invoices.Invoices_AxeTests.T278846_Axe_FirmInvoicesPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Email.Email_AxeTests.T279091_Axe_CustomEmailSetup",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Email.Email_AxeTests.T279186_Axe_CustomEmailSetupEdit",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Documents.Document_AxeTests.T278996_Axe_MatterDocumentsPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Dashboards.MyDashboard_AxeTests.T278902_Axe_MyDashboard",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Budgeting.Budgeting_AxeTests.T278886_Axe_BudgetEdit",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Budgeting.Budgeting_AxeTests.T279556_Axe_BudgetInfo",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Authentication.Logon_AxeTests.T278561_Axe_LogonPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Authentication.Logon_AxeTests.T279235_Axe_CompanyLogonPage",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.Accruals.Accruals_AxeTests.T279787_Axe_AccrualsPost",
+                "Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.Security_AxeTests.T284128_Axe_FirmUserMatterAccess",
+"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.SystemAdministration_AxeTests.T284127_Axe_TestActionRetryRedirect",
+"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284125_Axe_MatterCategoryTree",
+"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284126_Axe_SubstantiveLawTree"
  };
             var errors = new StringBuilder();
             foreach (var fullTestName in fullTestNames)
