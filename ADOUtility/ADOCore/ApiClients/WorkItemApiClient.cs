@@ -34,6 +34,12 @@ namespace ADOCore.ApiClients
                 Path = "/rev",
                 Value = rev
             };
+            var updateTestId = new UpdateWorkItem()
+            {
+                Op = "add",
+                Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestId",
+                Value = Guid.NewGuid().ToString()
+            };
             var updateTestName = new UpdateWorkItem()
             {
                 Op = "add",
@@ -46,12 +52,6 @@ namespace ADOCore.ApiClients
                 Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestStorage",
                 Value = "Tracker.Testing.Automation.Tests.dll"
             };
-            var updateTestId = new UpdateWorkItem()
-            {
-                Op = "add",
-                Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestId",
-                Value = Guid.NewGuid().ToString()
-            };
             var updateTestStatus = new UpdateWorkItem()
             {
                 Op = "add",
@@ -62,6 +62,7 @@ namespace ADOCore.ApiClients
             var body = new object[]
                 { updateRoot ,
                 updateTestName,
+                updateStorage,
                 updateTestId,
                 updateTestStatus};
 
