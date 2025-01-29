@@ -320,6 +320,8 @@ namespace TestRuns.Steps
             var ids = new List<(RunInfo, int)>();
             foreach (var (runInfo, attchInfos) in runAttchInfos)
             {
+                if (attchInfos == null)
+                    continue;
                 foreach (var attchInfo in attchInfos.value)
                 {
                     if (attchInfo.fileName.Contains(type))
