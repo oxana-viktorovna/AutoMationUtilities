@@ -31,10 +31,10 @@ namespace TestRuns.Steps
             return client.UpdateAutomationAssociation(workItemId, fullTestName, item.rev);
         }
 
-        public IRestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
+        public IRestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
         {
             var item = GetWorkItem(workItemId);
-            return client.AddTestedByLinksToWorkItem(workItemId, linkIds, item.rev);
+            return client.AddRelatedLinksToWorkItem(workItemId, linkIds, item.rev);
         }
     }
 }

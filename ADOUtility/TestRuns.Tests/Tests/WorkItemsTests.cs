@@ -43,8 +43,8 @@ namespace TestRuns.Tests
                 if (testNumber != 0)
                 {
                     var responce = apiSteps.UpdateAutomationAssociation(testNumber, fullTestName);
-                    if(responce.StatusCode != HttpStatusCode.OK)
-                            errors.AppendLine($"{testNumber} had not been assosiated. {responce.Content}");
+                    if (responce.StatusCode != HttpStatusCode.OK)
+                        errors.AppendLine($"{testNumber} had not been assosiated. {responce.Content}");
                 }
             }
 
@@ -55,20 +55,16 @@ namespace TestRuns.Tests
         [TestMethod]
         public void AddLinks()
         {
-            var workitem = 276276;
+            var workitem = 284895;
             var linkids = new int[] {
-253762,
-140648,
-140643,
-140660,
-140656,
-253768,
-253770,
-253769,
-140640
+157754,
+180853
+
+
+
  };
-            var responce = apiSteps.AddTestedByLinksToWorkItem(workitem, linkids);
-            Assert.AreEqual (HttpStatusCode.OK, responce.StatusCode);
+            var responce = apiSteps.AddRelatedLinksToWorkItem(workitem, linkids);
+            Assert.AreEqual(HttpStatusCode.OK, responce.StatusCode);
         }
 
         private List<string> GetFullTestNames()
@@ -80,11 +76,11 @@ namespace TestRuns.Tests
             {
                 d = d.Trim().Replace(":", ".");
                 var m = regex.Match(d);
-                if(!string.IsNullOrEmpty(m.Value))
+                if (!string.IsNullOrEmpty(m.Value))
                     d = d.Replace(m.Value, "");
 
                 return d;
-                }).Distinct().ToList();
+            }).Distinct().ToList();
 
             return result;
         }

@@ -69,7 +69,7 @@ namespace ADOCore.ApiClients
             return SendAdoPatchRequest($"wit/workitems/{workItemId}", body, "application/json-patch+json");
         }
 
-        public IRestResponse AddTestedByLinksToWorkItem(int workItemId, IEnumerable<int> linkIds, int rev)
+        public IRestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds, int rev)
         {
             var body = new List<object>();
             var updateRoot = new RootUpdateWorkItem()
