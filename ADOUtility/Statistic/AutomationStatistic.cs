@@ -1,4 +1,5 @@
 using ADOCore;
+using Microsoft.Extensions.Primitives;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using Statistic.Settings;
@@ -48,26 +49,24 @@ namespace Statistic
         [TestMethod]
         public void Get255Scope()
         {
-            var stistic = new StringBuilder("AreaPath \t P0 \t P1");
+            var stistic = new StringBuilder("AreaPath \t total \t auto");
             stistic.AppendLine();
             foreach (var areaPath in defaultAreaPathes)
             {
                 stistic.Append(areaPath + "\t");
-                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 0) + "\t");
-                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 1) + "\t");
+                var total_p0 = autoStatSteps.GetNumTests(areaPath, "255scope", 0);
+                var total_p1 = autoStatSteps.GetNumTests(areaPath, "255scope", 1);
+                var total = total_p0 + total_p1;
+
+                var auto_p0 = autoStatSteps.GetNumTests(areaPath, "255scope", 0, true);
+                var auto_p1 = autoStatSteps.GetNumTests(areaPath, "255scope", 1, true);
+                var auto_total = auto_p0 + auto_p1;
+
+                stistic.Append(total + "\t" + auto_total + "\t");
                 stistic.AppendLine();
             }
 
             stistic.AppendLine();
-            stistic.Append("AreaPath \t P0_AUTO \t P1_AUTO");
-            stistic.AppendLine();
-            foreach (var areaPath in defaultAreaPathes)
-            {
-                stistic.Append(areaPath + "\t");
-                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 0, true) + "\t");
-                stistic.Append(autoStatSteps.GetNumTests(areaPath, "255scope", 1, true) + "\t");
-                stistic.AppendLine();
-            }
 
             Assert.Inconclusive(stistic.ToString());
         }
