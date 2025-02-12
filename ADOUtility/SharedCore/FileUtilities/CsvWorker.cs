@@ -17,17 +17,32 @@ namespace SharedCore.FileUtilities
         public string Splitter { get; private set; }
 
         public void Write(StringBuilder csv)
-            => File.WriteAllText(filePath, csv.ToString());
+        {
+            CreateFile(filePath);
+            File.WriteAllText(filePath, csv.ToString());
+        }
 
         public void Write(IEnumerable<string> csv)
-            => File.WriteAllLines(filePath, csv);
+        {
+            CreateFile(filePath);
+            File.WriteAllLines(filePath, csv);
+        }
 
         public List<string[]> Read()
         {
+            if (!File.Exists(filePath))
+                return null;
+
             var lines = File.ReadAllLines(filePath);
             var resultData = lines.Select(line => line.Split(Splitter)).ToList();
 
             return resultData;
+        }
+
+        private void CreateFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+                using (File.Create(filePath)) { }
         }
     }
 }
