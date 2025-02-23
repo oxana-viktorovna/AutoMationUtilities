@@ -3,6 +3,9 @@ using ADOCore.ApiClients;
 using ADOCore.ApiClietns;
 using ADOCore.Models;
 using SharedCore.StringUtilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TestRuns.Steps
 {
@@ -45,16 +48,19 @@ namespace TestRuns.Steps
             var runAttchmentsInfos = GetRunAttchmentsInfo(runInfos);
             var runAttchmentsIds = GetAttchsIdsByType(runAttchmentsInfos, ".trx");
             var testRunTrxAttachments = GetTestRunTrxAttachments(runAttchmentsIds);
-            var testRunResults = testRunTrxAttachments.Where(trx => trx.testRunAttach != null && trx.testRunAttach.Results != null).SelectMany(trx => {
-                var results = trx.testRunAttach.Results;
-                foreach (var result in results)
-                {
-                    result.RunName = trx.runName;
-                    result.TestNumber = Convert.ToInt32(result.testName.GetTestCaseNumber());
-                }
+            var testRunResults = testRunTrxAttachments
+                .Where(trx => trx.testRunAttach != null && trx.testRunAttach.Results != null)
+                .SelectMany(trx => {
+                    var results = trx.testRunAttach.Results;
+                    foreach (var result in results)
+                    {
+                        result.RunName = trx.runName;
+                        var testNum_Str = result.testName.GetTestCaseNumber();
+                        result.TestNumber = Int32.TryParse(testNum_Str, out int testnum) ? testnum : 0;
+                    }
 
-                return results;
-            });
+                    return results;
+                });
 
             return testRunResults?.ToList();
         }

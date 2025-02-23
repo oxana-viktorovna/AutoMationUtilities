@@ -2,6 +2,8 @@
 using ADOCore.ApiClients;
 using ADOCore.Models;
 using RestSharp;
+using System;
+using System.Collections.Generic;
 
 namespace TestRuns.Steps
 {

@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ADOCore\ADOCore.csproj" />
-    <ProjectReference Include="..\TestRuns\TestRuns.csproj" />
   </ItemGroup>
 
   <ItemGroup>

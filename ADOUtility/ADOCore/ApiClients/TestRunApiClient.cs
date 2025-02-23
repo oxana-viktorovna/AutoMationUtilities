@@ -1,11 +1,10 @@
-﻿using RestSharp;
-using System;
+﻿using ADOCore.ApiClients;
+using ADOCore.Models;
+using RestSharp;
+using SharedCore.FileUtilities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using ADOCore.Models;
-using ADOCore.ApiClients;
-using SharedCore.FileUtilities;
 
 namespace ADOCore.ApiClietns
 {

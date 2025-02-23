@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Statistic.Query
 {
@@ -22,23 +21,9 @@ namespace Statistic.Query
             return this;
         }
 
-        internal WorkItemQueryBuilder AddAttributesToGet(IEnumerable<string> attributes)
-        {
-            query.SelectAttributes.AddRange(attributes);
-
-            return this;
-        }
-
         internal WorkItemQueryBuilder AddAttributesToGet(string attribute)
         {
             query.SelectAttributes.Add(attribute);
-
-            return this;
-        }
-
-        internal WorkItemQueryBuilder AddConditions(IEnumerable<string> conditions)
-        {
-            query.Conditions.AddRange(conditions);
 
             return this;
         }

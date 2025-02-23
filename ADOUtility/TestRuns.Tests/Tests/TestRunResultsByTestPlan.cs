@@ -14,7 +14,7 @@ using TestRuns.Utilities;
 namespace TestRuns.Tests
 {
     [TestClass]
-    public class TestPlanTests
+    public class TestRunResultsByTestPlan
     {
         private AdoSettings adoSettings;
         private TestPlanApiSteps apiSteps;
@@ -43,6 +43,7 @@ namespace TestRuns.Tests
 
         private Dictionary<int, string> MinorSuits = new()
         {
+            { 280538, "US Analytics" },
             { 266785, "US Full" },
             { 266783, "UK Full" },
             { 266787, "US NonParallel" },
@@ -60,7 +61,7 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void GetSuiteFailedTests()
+        public void GetSuiteFailedTestIds()
         {
             var suiteId = 274484;
             var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suiteId);
@@ -122,7 +123,7 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void GetSuiteFailedTestsNightly()
+        public void GetSuiteFailedTestIdsNightly()
         {
             var result = new StringBuilder();
 
@@ -136,7 +137,7 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void GetSuiteFailedTestsMajorRelease()
+        public void GetSuiteFailedTestIdsMajorRelease()
         {
             var result = new StringBuilder();
             foreach (var suite in MajorSuits)
@@ -149,7 +150,7 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void GetSuiteFailedTestsMinorRelease()
+        public void GetSuiteFailedTestIdsMinorRelease()
         {
             var result = new StringBuilder();
             foreach (var suite in MinorSuits)
@@ -164,19 +165,20 @@ namespace TestRuns.Tests
         [TestMethod]
         public void GetSuiteFailedTestResults()
         {
-            var runId = 3475954; // Go to pipeline stage. Check id in the end of the log for 'UI Test Run' task. E.g. 'Test run id: 3424019'
-            var suiteId = 281104;
-            var suitetestsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suiteId);
+            var runId = 3603820; // Go to pipeline stage. Check id in the end of the log for 'UI Test Run' task. E.g. 'Test run id: 3424019'
+            var suiteId = 293755;
+            var workItemsApiSteps = new WorkItemApiSteps(adoSettings);
+            var fileName = $"Failed_UI_suiteId{suiteId}_runId{runId}";
+            var filePath = Path.Combine(testSettings.SaveFolder, fileName + ".csv");
+            var csv = new CsvWorker(filePath);
 
-            var adoSettingsReader = new SettingsReader("ADOconfig.json");
-            var adoSettings = new AdoSettings(adoSettingsReader);
-            var apiStepsNew = new TestRunApiStepsNew(adoSettings);
-            var allTestResults = apiStepsNew.GetTrxAttachmentsByRunId(runId);
+            var suitetestsIds = this.apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suiteId);
 
-            var reportBuilder = new RunNewReportBuilder(testSettings.SaveFolder, $"Results_TestPlan{TestPlanId}TesSuite{suiteId}RunId{runId}_{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}");
-            var uiReportBuilder = new RunNewUiSummaryBuilder(reportBuilder.Book);
-            uiReportBuilder.CreateFullFailedUiReport(ResultReportConverter.ConvertAxe(allTestResults.ToList(), new WorkItemApiSteps(adoSettings)));
-            reportBuilder.SaveReport();
+            var apiSteps = new TestRunApiSteps(adoSettings);
+            var allTestResults = apiSteps.GetTrxAttachmentsByRunId(runId);
+
+            var content = ResultReportConverter.ToCsvContent(allTestResults, workItemsApiSteps);
+            csv.Write(content);
         }
     }
 }

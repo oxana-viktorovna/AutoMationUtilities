@@ -3,8 +3,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,9 +30,9 @@ namespace TestRuns.Tests
             var fullTestNames = new List<string>()
             {
                 "Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.Security_AxeTests.T284128_Axe_FirmUserMatterAccess",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.SystemAdministration_AxeTests.T284127_Axe_TestActionRetryRedirect",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284125_Axe_MatterCategoryTree",
-"Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284126_Axe_SubstantiveLawTree"
+                "Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.SystemAdministration_AxeTests.T284127_Axe_TestActionRetryRedirect",
+                "Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284125_Axe_MatterCategoryTree",
+                "Tracker.Testing.Automation.Tests.Tests.Accessibility.SystemSetup.MattersSetup.MattersSetup_AxeTests.T284126_Axe_SubstantiveLawTree"
  };
             var errors = new StringBuilder();
             foreach (var fullTestName in fullTestNames)
@@ -53,44 +51,15 @@ namespace TestRuns.Tests
         }
 
         [TestMethod]
-        public void AddLinks()
+        public void AddRelatedLinks()
         {
             var workitem = 284895;
             var linkids = new int[] {
-157754,
-180853
-
-
-
- };
+                157754,
+                180853
+        };
             var responce = apiSteps.AddRelatedLinksToWorkItem(workitem, linkids);
             Assert.AreEqual(HttpStatusCode.OK, responce.StatusCode);
-        }
-
-        private List<string> GetFullTestNames()
-        {
-            var filePath = "C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\BVT\\FullTestNames.txt";
-            var fileData = File.ReadAllLines(filePath);
-            var regex = new Regex("\\(([^()]*)\\)");
-            var result = fileData.Select(d =>
-            {
-                d = d.Trim().Replace(":", ".");
-                var m = regex.Match(d);
-                if (!string.IsNullOrEmpty(m.Value))
-                    d = d.Replace(m.Value, "");
-
-                return d;
-            }).Distinct().ToList();
-
-            return result;
-        }
-
-        private List<int> GetTestNumbers(List<string> testNames)
-        {
-            var result = testNames.Select(name => GetTestNumber(name)).Distinct().ToList();
-            result.Remove(0);
-
-            return result;
         }
 
         private int GetTestNumber(string testName)

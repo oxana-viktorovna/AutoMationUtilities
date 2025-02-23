@@ -9,15 +9,10 @@
 
   <ItemGroup>
     <None Remove="AutoStatisticSettings.json" />
-    <None Remove="StatisticResources\AutoUIStatistic.xlsx" />
-    <None Remove="StatisticResources\AutoUIStatisticInitial.xlsx" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="AutoStatisticSettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="StatisticResources\AutoUIStatisticInitial.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

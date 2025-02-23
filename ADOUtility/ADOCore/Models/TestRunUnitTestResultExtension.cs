@@ -8,9 +8,15 @@ namespace ADOCore.Models
         public static List<TestRunUnitTestResult> GetPassedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
             => allTestResults.Where(x => x.outcome == "Passed").ToList();
 
+        /// <summary>
+        /// Getting Not passed results of UI tests. Axe is not included
+        /// </summary>
+        /// <param name="allTestResults"></param>
+        /// <returns></returns>
         public static List<TestRunUnitTestResult> GetNotPassedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
         {
             var groups = allTestResults
+                .Where(r => !r.testName.ToLower().Contains("axe"))
                 .GroupBy(r => r.testName);
             var failedGroups = groups.Where(gr => !gr.Where(r => r.outcome == "Passed").Any());
             var results = failedGroups.Select(gr => gr.Last()).ToList();
@@ -18,12 +24,29 @@ namespace ADOCore.Models
             return results;
         }
 
-        public static List<TestRunUnitTestResult> GetNotExecutedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
+        /// <summary>
+        /// Getting Not passed results of Axe tests.
+        /// </summary>
+        /// <param name="allTestResults"></param>
+        /// <returns></returns>
+        public static List<TestRunUnitTestResult> GetAxeNotPassedResults(this IEnumerable<TestRunUnitTestResult> allTestResults)
         {
             var groups = allTestResults
-                   .GroupBy(r => r.testName);
-            var failedGroups = groups.Where(gr => gr.Where(r => r.outcome == "NotExecuted").Any());
-            var results = failedGroups.Select(gr => gr.Last()).ToList();
+                .Where(r => r.testName.ToLower().Contains("axe"))
+                .GroupBy(r => r.testName);
+
+            var failedGroups = groups.Where(gr => !gr.Where(r => r.outcome == "Passed").Any());
+
+            var results = failedGroups.Select(gr =>
+            {
+                var lastResult = gr.Last();
+                if (lastResult.Output?.ErrorInfo?.Message != null &&
+                    !lastResult.Output.ErrorInfo.Message.Contains("Accessibility violations"))
+                {
+                    lastResult.outcome = "NON-A11y FAILURE";
+                }
+                return lastResult;
+            }).ToList();
 
             return results;
         }

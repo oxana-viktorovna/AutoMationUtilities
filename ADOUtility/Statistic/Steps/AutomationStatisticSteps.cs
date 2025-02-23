@@ -4,14 +4,15 @@ using ADOCore.Models;
 using Statistic.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Statistic.Steps
 {
     internal class AutomationStatisticSteps
     {
         public AutomationStatisticSteps(
-            AdoSettings adoSettings, 
-            IEnumerable<string> areaPathes, 
+            AdoSettings adoSettings,
+            IEnumerable<string> areaPathes,
             DateTime? asOf = null)
         {
             baseQueryBuilder = new WorkItemQueryBuilder()
@@ -29,7 +30,11 @@ namespace Statistic.Steps
         private readonly WiqlApiClient wiqlApiClient;
         private readonly DateTime? asOf;
 
-
+        internal Workitemrelation[] GetLinkedItems(string? query, string releation)
+        {
+            var response = wiqlApiClient.PostWiqlQueryLinkedItems(query);
+                return response.workItemRelations.Where(w => w.rel != null).ToArray();
+        }
 
         internal Workitem[] Get255scopeAutomatedTests()
         {

@@ -1,4 +1,6 @@
-﻿namespace TestRuns.Utilities
+﻿using System.Collections.Generic;
+
+namespace TestRuns.Utilities
 {
     public class BuildNameHelper
     {

@@ -20,5 +20,13 @@ namespace ADOCore.ApiClietns
             return JsonConvert.DeserializeObject<WorkItemResponce>(responce.Content);
         }
         
+        public WiqlHierarchyLinks_QueryResponce PostWiqlQueryLinkedItems(string query)
+        {
+            var responce = SendAdoRequest("wit/wiql", Method.POST, body: new WiqlQueryRequest(query));
+            if (responce.StatusCode != System.Net.HttpStatusCode.OK)
+                throw new System.Exception(responce.Content);
+
+            return JsonConvert.DeserializeObject<WiqlHierarchyLinks_QueryResponce>(responce.Content);
+        }
     }
 }

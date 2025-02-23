@@ -13,22 +13,6 @@ namespace ADOCore.ApiClients
         {
         }
 
-        public TestSuiteTests GetSuiteTests(int testPlanId, int suiteId)
-        {
-            var response = SendAdoRequest($"test/Plans/{testPlanId}/suites/{suiteId}/testcases", Method.GET, version: "5.1");
-
-            return JsonSerializer.Deserialize<TestSuiteTests>(response.Content);
-        }
-
-        public string GetRunsForSuite(int suiteId)
-        {
-            var param = new List<(string, string)>
-            { ("queryOrder", "finishTimeDesc&$top=1&testSuiteId={suiteId}")};
-            var response = SendAdoRequest($"test/runs", Method.GET, param, version: "6.0-preview");
-
-            return response.Content;
-        }
-
         public IEnumerable<TestPoint> GetSuiteTestPoints(int testPlanId, int suiteId)
         {
             string continuationToken = null;

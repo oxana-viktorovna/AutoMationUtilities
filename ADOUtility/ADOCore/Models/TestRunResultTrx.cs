@@ -349,6 +349,8 @@
 
         public string RunName { get; set; }
 
+        public int? TestNumber { get; set; }
+
         /// <remarks/>
         public TestRunUnitTestResultOutput Output
         {
