@@ -20,7 +20,8 @@ namespace ADOCore.ApiClients
             do
             {
                 var testPointsBatch = GetSuiteTestPointsBatch(testPlanId, suiteId, continuationToken, out continuationToken);
-                testPoints.AddRange(testPointsBatch);
+                if(testPointsBatch != null)
+                    testPoints.AddRange(testPointsBatch);
             }
             while (!string.IsNullOrEmpty(continuationToken));
 
