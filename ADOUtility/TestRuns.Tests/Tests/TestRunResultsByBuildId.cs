@@ -33,15 +33,15 @@ namespace TestRuns.Tests
         private TestRunTestSettings testSettings;
         private TestRunApiSteps apiStepsNew;
         private BuildApiSteps buildApiSteps;
-        private const int BuildId = 695230;
+        private const int BuildId = 696269;
 
         [TestMethod]
         public void GetDiffAxeResults_Csv()
         {
-            var previousBuildIds = new List<int> { 695850 }; // first original run, then rerun
-            var currentBuildIds = new List<int> { 696097 };
+            var previousBuildIds = new List<int> { 695475, 695623}; // first original run, then rerun
+            var currentBuildIds = new List<int> { 695701, 695767 };
             var workItemsApiSteps = new WorkItemApiSteps(adoSettings);
-            var currentDate = DateTime.Now.ToString("dd-MM-yy");
+            var currentDate = DateTime.Now.ToString("dd-MM-yy-HH-mm-ss");
             var fileName = $"Axe_Diff_{currentDate}";
             var filePath = Path.Combine(testSettings.SaveFolder, fileName + ".csv");
             var csv = new CsvWorker(filePath);
@@ -56,11 +56,17 @@ namespace TestRuns.Tests
                     if (!error.Contains("Accessibility violations"))
                         error = nonAxePrefix + " --> " + error;
 
-                    return error;
+                    error = error.Replace("Multiple failures or warnings in test:", "")
+                            .Replace("Accessibility violations found on ","");
+
+                    if (error.Length > 32760)
+                        error = error.Substring(0, 32760);
+
+                    return error.Trim();
                 };
 
             var previousTrx = new List<TestRunUnitTestResult>();
-            foreach (var buildId in currentBuildIds)
+            foreach (var buildId in previousBuildIds)
             {
                 var buildTrx = apiStepsNew.GetTrxAttachments(buildId, "Axe");
                 if (!previousTrx.Any())
@@ -134,11 +140,11 @@ namespace TestRuns.Tests
                     continue;
                 if (curTrx.outcome != "Passed" && prevTrx.outcome == "Passed")
                     content.AppendLine($"{testIdName},Passed,{curError}");
-                if (curTrx.outcome == "Passed" && prevTrx.outcome != "Passed")
+                else if (curTrx.outcome == "Passed" && prevTrx.outcome != "Passed")
                     content.AppendLine($"{testIdName},{prevError},Passed");
-                if (curError != prevError)
+                else if (curError != prevError)
                     content.AppendLine($"{testIdName},{prevError},{curError}");
-                if(curError.Contains(nonAxePrefix))
+                else if(curError.Contains(nonAxePrefix))
                     content.AppendLine($"{testIdName},same-->,{curError}");
             }
 
