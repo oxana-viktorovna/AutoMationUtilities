@@ -29,4 +29,8 @@
     <ProjectReference Include="..\SharedCore\SharedCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Steps\" />
+  </ItemGroup>
+
 </Project>

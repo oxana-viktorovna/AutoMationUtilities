@@ -1,19 +1,14 @@
 using ADOCore;
-using Microsoft.Extensions.Primitives;
+using ADOCore.Steps;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NPOI.OpenXmlFormats.Spreadsheet;
-using NPOI.SS.Formula.Functions;
 using SharedCore.FileUtilities;
 using SharedCore.Settings;
 using Statistic.Settings;
-using Statistic.Steps;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TestRuns.Steps;
 
 namespace Statistic
 {
@@ -39,7 +34,8 @@ namespace Statistic
         [TestMethod]
         public void GetNewFeatureAutomationStat()
         {
-            var pbis = autoStatSteps.GetLinkedItems(@"SELECT
+            var wiqlSteps = new WiqlQuerySteps(adoSettings);
+            var pbis = wiqlSteps.GetLinkedItems(@"SELECT
     [System.Id]
 FROM workitemLinks
 WHERE
@@ -60,11 +56,10 @@ WHERE
     )
 ORDER BY [System.AreaPath],
     [System.Id]
-MODE (MustContain)",
-"System.LinkTypes.Hierarchy-Forward");
+MODE (MustContain)");
             var pbiIds = pbis.Select(pbi => pbi.target.id);
 
-            var pbiTasks = autoStatSteps.GetLinkedItems($@"SELECT
+            var pbiTasks = wiqlSteps.GetLinkedItems($@"SELECT
     [System.Id],
     [System.WorkItemType],
     [System.Title],
@@ -83,13 +78,12 @@ WHERE
         AND [Target].[System.State] <> 'Removed'
     )
 ORDER BY [System.Id]
-MODE (MustContain)
-", "System.LinkTypes.Hierarchy-Forward");
+MODE (MustContain)");
             var pbiTaskIds = pbiTasks.Select(pbit => pbit.target.id);
 
             var allIds = pbiTaskIds.Concat(pbiIds).ToList();
 
-            var tests = autoStatSteps.GetLinkedItems($@"SELECT
+            var tests = wiqlSteps.GetLinkedItems($@"SELECT
     [System.Id]
 FROM workitemLinks
 WHERE
@@ -107,8 +101,7 @@ WHERE
         AND [Target].[System.State] <> 'Closed'
     )
 ORDER BY [System.Id]
-MODE (MustContain)",
-"Microsoft.VSTS.Common.TestedBy-Forward");
+MODE (MustContain)");
 
             var content = new StringBuilder();
             content.AppendLine("Feature Id,Feature Name,PBI Id,Task Id,Area Path,Test Id,Test Name,Test Priority,Test Iteration Path");

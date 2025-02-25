@@ -1,14 +1,13 @@
-﻿using ADOCore;
-using ADOCore.ApiClietns;
+﻿using ADOCore.ApiClietns;
 using ADOCore.Models;
-using Statistic.Query;
+using ADOCore.Models.WiqlQuery;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Statistic.Steps
+namespace ADOCore.Steps
 {
-    internal class AutomationStatisticSteps
+    public class AutomationStatisticSteps
     {
         public AutomationStatisticSteps(
             AdoSettings adoSettings,
@@ -30,13 +29,7 @@ namespace Statistic.Steps
         private readonly WiqlApiClient wiqlApiClient;
         private readonly DateTime? asOf;
 
-        internal Workitemrelation[] GetLinkedItems(string? query, string releation)
-        {
-            var response = wiqlApiClient.PostWiqlQueryLinkedItems(query);
-                return response.workItemRelations.Where(w => w.rel != null).ToArray();
-        }
-
-        internal Workitem[] Get255scopeAutomatedTests()
+        public Workitem[] Get255scopeAutomatedTests()
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
@@ -76,7 +69,7 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        internal int GetAutomatedTestCountByPriority(int priority)
+        public int GetAutomatedTestCountByPriority(int priority)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
@@ -91,7 +84,7 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        internal int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
+        public int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
@@ -106,7 +99,7 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        internal int GetTestCountByPriority(int priority)
+        public int GetTestCountByPriority(int priority)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
@@ -121,7 +114,7 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        internal int GetTestCountByPriority(IEnumerable<int> priorities)
+        public int GetTestCountByPriority(IEnumerable<int> priorities)
         {
             var builder = (WorkItemQueryBuilder)baseQueryBuilder.Clone();
             var query = builder

@@ -1,10 +1,10 @@
 ﻿using ADOCore.Models;
+using ADOCore.Steps;
 using SharedCore.StringUtilities;
 using System;
 using System.Collections.Generic;
-using TestRuns.Steps;
 
-namespace TestRuns.Utilities
+namespace ADOCore.Utilities
 {
     public static class ResultReportConverter
     {

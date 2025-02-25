@@ -5,7 +5,7 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 
-namespace TestRuns.Steps
+namespace ADOCore.Steps
 {
     public class WorkItemApiSteps
     {

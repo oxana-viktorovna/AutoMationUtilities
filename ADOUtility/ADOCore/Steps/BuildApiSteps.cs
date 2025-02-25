@@ -1,8 +1,7 @@
-﻿using ADOCore;
-using ADOCore.ApiClients;
-using TestRuns.Utilities;
+﻿using ADOCore.ApiClients;
+using ADOCore.Utilities;
 
-namespace TestRuns.Steps
+namespace ADOCore.Steps
 {
     public class BuildApiSteps
     {

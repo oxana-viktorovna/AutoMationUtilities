@@ -1,4 +1,5 @@
 ﻿using ADOCore;
+using ADOCore.Steps;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.Settings;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using TestRuns.Steps;
 
 namespace TestRuns.Tests
 {

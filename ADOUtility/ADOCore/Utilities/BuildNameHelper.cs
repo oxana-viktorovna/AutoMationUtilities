@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TestRuns.Utilities
+namespace ADOCore.Utilities
 {
     public class BuildNameHelper
     {

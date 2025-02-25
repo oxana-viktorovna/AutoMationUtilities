@@ -1,4 +1,6 @@
 ﻿using ADOCore;
+using ADOCore.Steps;
+using ADOCore.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.BuildInTypesExtentions;
 using SharedCore.FileUtilities;
@@ -8,8 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using TestRuns.Steps;
-using TestRuns.Utilities;
 
 namespace TestRuns.Tests
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Statistic.Query
+namespace ADOCore.Models.WiqlQuery
 {
     public class WiqlSimpleQuery : ICloneable
     {
