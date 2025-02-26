@@ -26,7 +26,6 @@ namespace TestRuns.Tests
             { 265004, "UI" },
             { 264947, "NonParallel" },
             { 279185, "Analytics" },
-            { 278993, "Axe" },
             { 277588, "CDW" },
             { 274457, "NewRa" }
         };
@@ -132,6 +131,7 @@ namespace TestRuns.Tests
                 var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Key);
                 result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
             }
+            result.AppendLine("Axe: !!! To Get non axe failures Ids Run GetAxeTestResultsByBuildId_NotPassed_Csv()");
 
             Assert.Inconclusive(Environment.NewLine + result.ToString());
         }

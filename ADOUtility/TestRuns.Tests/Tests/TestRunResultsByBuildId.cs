@@ -29,6 +29,9 @@ namespace TestRuns.Tests
             apiStepsNew = new TestRunApiSteps(adoSettings);
             buildApiSteps = new BuildApiSteps(adoSettings);
             workItemApiSteps = new WorkItemApiSteps(adoSettings);
+
+            if(BuildId == -1)
+                Assert.Inconclusive("Populate BuildId at the class. Id can be taken from pipeline's Url");
         }
 
         private AdoSettings adoSettings;
@@ -36,7 +39,7 @@ namespace TestRuns.Tests
         private TestRunApiSteps apiStepsNew;
         private BuildApiSteps buildApiSteps;
         private WorkItemApiSteps workItemApiSteps;
-        private const int BuildId = 696903;
+        private const int BuildId = -1;
 
         [TestMethod]
         public void GetDiffAxeResults_Csv()
@@ -191,12 +194,27 @@ namespace TestRuns.Tests
 
             var allTestResults = apiStepsNew.GetTrxAttachments(BuildId);
             var notPassedUIResults = allTestResults.GetNotPassedResults();
-            var notPassedAxeResults = allTestResults.GetAxeNotPassedResults();
 
             var contentUI = ResultReportConverter.ToCsvContent(notPassedUIResults, workItemApiSteps);
+            csv.Write(contentUI);
+        }
+
+        [TestMethod]
+        public void GetAxeTestResultsByBuildId_NotPassed_Csv()
+        {
+            var shortBuildName = buildApiSteps.GetFullBuildName(BuildId).Replace(".", "_");
+            var fileName = $"Failed_AXE_{shortBuildName}";
+            var filePath = Path.Combine(testSettings.SaveFolder, fileName + ".csv");
+            var csv = new CsvWorker(filePath);
+
+            var allTestResults = apiStepsNew.GetTrxAttachments(BuildId, "Axe");
+            var notPassedAxeResults = allTestResults.GetAxeNotPassedResults();
+
             var contentAxe = ResultReportConverter.ToCsvContent(notPassedAxeResults, workItemApiSteps);
-            var content = contentUI.Concat(contentAxe);
             csv.Write(contentAxe);
+
+            var nonAxeFailures = notPassedAxeResults.Where(r => r.outcome == "NON-A11y FAILURE").Select(r => r.TestNumber);
+            Assert.Inconclusive(Environment.NewLine + "NonAxe failures: " + string.Join(",", nonAxeFailures));
         }
 
         [TestMethod]
