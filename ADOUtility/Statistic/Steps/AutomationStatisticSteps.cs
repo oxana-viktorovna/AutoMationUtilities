@@ -13,7 +13,7 @@ namespace Statistic.Steps
             IEnumerable<string> areaPathes,
             DateTime? asOf = null)
         {
-            baseQueryBuilder = new WorkItemWiqlQueryBuilder()
+            baseQueryBuilder = new WiqlFlatQueryBuilder()
                .AddAttributesToGet("[System.Id]")
                .AddAttributesToGet(WorkItemFields.GetAdoName("Title"))
                .AddAttributesToGet(WorkItemFields.GetAdoName("AreaPath"))
@@ -23,13 +23,13 @@ namespace Statistic.Steps
             this.asOf = asOf;
         }
 
-        private readonly WorkItemWiqlQueryBuilder baseQueryBuilder;
+        private readonly WiqlFlatQueryBuilder baseQueryBuilder;
         private readonly WiqlApiClient wiqlApiClient;
         private readonly DateTime? asOf;
 
         public int GetNumTests(string areaPath, string tag, int? priority, bool automated = false)
         {
-            var queryBuilder = new WorkItemWiqlQueryBuilder()
+            var queryBuilder = new WiqlFlatQueryBuilder()
                    .AddAttributesToGet("[System.Id]")
                    .AddAttributesToGet(WorkItemFields.GetAdoName("Title"))
                    .AddAttributesToGet(WorkItemFields.GetAdoName("Priority"))
@@ -55,7 +55,7 @@ namespace Statistic.Steps
 
         public int GetAutomatedTestCountByPriority(int priority)
         {
-            var builder = (WorkItemWiqlQueryBuilder)baseQueryBuilder.Clone();
+            var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
                 .AddAutomatedTestsCondition()
                 .AddSinglePriorityCondition(priority, WiqlConsnt.Operator.Equal)
@@ -70,7 +70,7 @@ namespace Statistic.Steps
 
         public int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
         {
-            var builder = (WorkItemWiqlQueryBuilder)baseQueryBuilder.Clone();
+            var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
                 .AddAutomatedTestsCondition()
                 .AddInPriorityCondition(priorities)
@@ -85,7 +85,7 @@ namespace Statistic.Steps
 
         public int GetTestCountByPriority(int priority)
         {
-            var builder = (WorkItemWiqlQueryBuilder)baseQueryBuilder.Clone();
+            var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
                 .AddStateCondition("Closed", WiqlConsnt.Operator.NotEqual)
                 .AddSinglePriorityCondition(priority, WiqlConsnt.Operator.Equal)
@@ -100,7 +100,7 @@ namespace Statistic.Steps
 
         public int GetTestCountByPriority(IEnumerable<int> priorities)
         {
-            var builder = (WorkItemWiqlQueryBuilder)baseQueryBuilder.Clone();
+            var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
                 .AddStateCondition("Closed", WiqlConsnt.Operator.NotEqual)
                 .AddInPriorityCondition(priorities)

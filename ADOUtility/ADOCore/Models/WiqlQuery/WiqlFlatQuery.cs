@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace ADOCore.Models.WiqlQuery
 {
-    public class WiqlSimpleQuery : ICloneable
+    public class WiqlFlatQuery : ICloneable
     {
-        public WiqlSimpleQuery(string mainTable)
+        public WiqlFlatQuery()
         {
-            MainTable = mainTable;
+            MainTable = "workitems";
         }
 
         public List<string> SelectAttributes { get; set; }
@@ -20,8 +20,7 @@ namespace ADOCore.Models.WiqlQuery
 
         public object Clone()
         {
-            var mainTable = string.Copy(MainTable);
-            var clonned = new WiqlSimpleQuery(mainTable)
+            var clonned = new WiqlFlatQuery()
             {
                 SelectAttributes = new List<string>(SelectAttributes),
                 Conditions = new List<string>(Conditions)

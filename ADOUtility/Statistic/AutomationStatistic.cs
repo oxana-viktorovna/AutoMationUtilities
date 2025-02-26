@@ -1,4 +1,5 @@
 using ADOCore;
+using ADOCore.Models.WiqlQuery;
 using ADOCore.Steps;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.FileUtilities;
@@ -37,73 +38,40 @@ namespace Statistic
         public void GetNewFeatureAutomationStat()
         {
             var wiqlSteps = new WiqlQuerySteps(adoSettings);
-            var pbis = wiqlSteps.GetLinkedItems(@"SELECT
-    [System.Id]
-FROM workitemLinks
-WHERE
-    (
-        [Source].[System.TeamProject] = @project
-        AND [Source].[System.WorkItemType] = 'Feature'
-        AND NOT [Source].[System.State] IN ('Done', 'Removed')
-        AND [Source].[System.IterationPath] UNDER 'Tracker\2025'
-        AND NOT [Source].[System.Tags] CONTAINS 'on hold'
-        AND NOT [Source].[System.Tags] CONTAINS 'On-Hold'
-        AND NOT [Source].[System.Tags] CONTAINS 'no release'
-        AND [Source].[System.State] <> 'In Design'
-    )
-    AND (
-        [Target].[System.TeamProject] = @project
-        AND [Target].[System.WorkItemType] = 'Product Backlog Item'
-        AND NOT [Target].[System.State] IN ('Removed', 'New', 'Approved')
-    )
-ORDER BY [System.AreaPath],
-    [System.Id]
-MODE (MustContain)");
+            var pbis_withIncorrectAdoSet = new List<int> {266895};
+
+            var query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
+                .AddSourceCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Feature")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('Done', 'Removed', 'In Design')")
+                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("IterationPath"), WiqlConsnt.Operator.Under, "Tracker\\2025")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "on hold")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "On-Hold")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "no release")
+                .AddSourceCondition(WiqlConsnt.Conjunction.Or, "[System.Id]", WiqlConsnt.Operator.In, "("+string.Join(',', pbis_withIncorrectAdoSet)+")")
+                .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Product Backlog Item")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('Removed', 'New', 'Approved')")
+                .Build();
+            var pbis = wiqlSteps.GetLinkedItems(query);
             var pbiIds = pbis.Select(pbi => pbi.target.id);
 
-            var pbiTasks = wiqlSteps.GetLinkedItems($@"SELECT
-    [System.Id],
-    [System.WorkItemType],
-    [System.Title],
-    [System.AssignedTo],
-    [System.State],
-    [System.Tags]
-FROM workitemLinks
-WHERE
-    (
-        [Source].[System.TeamProject] = @project
-        AND [Source].[System.Id] IN ({string.Join(',', pbiIds)})
-    )
-    AND (
-        [Target].[System.TeamProject] = @project
-        AND [Target].[System.WorkItemType] = 'Task'
-        AND [Target].[System.State] <> 'Removed'
-    )
-ORDER BY [System.Id]
-MODE (MustContain)");
+            query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
+                .AddSourceCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', pbiIds) + ")")
+                .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Task")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.NotEqual, "Removed")
+                .Build();
+            var pbiTasks = wiqlSteps.GetLinkedItems(query);
             var pbiTaskIds = pbiTasks.Select(pbit => pbit.target.id);
+            var allIParentds = pbiTaskIds.Concat(pbiIds).ToList();
 
-            var allIds = pbiTaskIds.Concat(pbiIds).ToList();
-
-            var tests = wiqlSteps.GetLinkedItems($@"SELECT
-    [System.Id]
-FROM workitemLinks
-WHERE
-    (
-        [Source].[System.TeamProject] = @project
-        AND NOT [Source].[System.State] IN ('Removed', 'New', 'Approved')
-        AND [Source].[System.Id] IN ({string.Join(',', allIds)})
-    )
-    AND (
-        [Target].[System.TeamProject] = @project
-        AND [Target].[System.WorkItemType] = 'Test Case'
-        AND [Target].[Microsoft.VSTS.TCM.AutomationStatus] <> 'Automated'
-        AND [Target].[TR.Elite.AutomationPriority] <> 4
-        AND [Target].[Microsoft.VSTS.Common.Priority] IN (0, 1)
-        AND [Target].[System.State] <> 'Closed'
-    )
-ORDER BY [System.Id]
-MODE (MustContain)");
+            query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
+                .AddSourceCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', allIParentds) + ")")
+                .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Test Case")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationStatus"), WiqlConsnt.Operator.NotEqual, "Automated")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationPriority"), WiqlConsnt.Operator.NotEqual, 4)
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Priority"), WiqlConsnt.Operator.In, "(0,1)")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.NotEqual, "Closed")
+                .Build();
+            var tests = wiqlSteps.GetLinkedItems(query);
 
             var content = new StringBuilder();
             content.AppendLine("Feature Id,Feature Name,PBI Id,Task Id,Area Path,Test Id,Test Name,Test Priority,Test Iteration Path");

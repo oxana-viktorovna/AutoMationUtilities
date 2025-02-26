@@ -1,5 +1,6 @@
 ﻿using ADOCore;
 using ADOCore.Models;
+using ADOCore.Models.WiqlQuery;
 using ADOCore.Steps;
 using ADOCore.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,13 +36,13 @@ namespace TestRuns.Tests
         private TestRunApiSteps apiStepsNew;
         private BuildApiSteps buildApiSteps;
         private WorkItemApiSteps workItemApiSteps;
-        private const int BuildId = 696382;
+        private const int BuildId = 696903;
 
         [TestMethod]
         public void GetDiffAxeResults_Csv()
         {
             var previousBuildIds = new List<int> { 695475, 695623}; // first original run, then rerun
-            var currentBuildIds = new List<int> { 695701, 695767 };
+            var currentBuildIds = new List<int> { 696903, 696945 };
             var currentDate = DateTime.Now.ToString("dd-MM-yy-HH-mm-ss");
             var fileName = $"Axe_Diff_{currentDate}";
             var filePath = Path.Combine(testSettings.SaveFolder, fileName + ".csv");
@@ -170,21 +171,12 @@ namespace TestRuns.Tests
                 return null;
 
             var wiqlSteps = new WiqlQuerySteps(adoSettings);
-
-            var bugs = wiqlSteps.GetLinkedItems($@"SELECT [System.Id]
-            FROM workitemLinks
-            WHERE
-                (
-                    [Source].[System.TeamProject] = @project
-                    AND [Source].[System.Id] = {testNumber}
-                )
-                AND (
-                    [Target].[System.TeamProject] = @project
-                    AND [Target].[System.WorkItemType] = 'Bug'
-                    AND NOT [Target].[System.State] IN ('Removed', 'Closed')
-                )
-            ORDER BY [System.Id]
-            MODE (MustContain)");
+            var query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
+                .AddSourceCondition(null, "[System.Id]", WiqlConsnt.Operator.Equal, testNumber)
+                .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Bug")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('Removed', 'Closed')")
+                .Build();
+            var bugs = wiqlSteps.GetLinkedItems(query);
 
             return bugs.GroupBy(b => b.target.id).Select(g => g.FirstOrDefault()).ToArray();
         }
@@ -204,7 +196,7 @@ namespace TestRuns.Tests
             var contentUI = ResultReportConverter.ToCsvContent(notPassedUIResults, workItemApiSteps);
             var contentAxe = ResultReportConverter.ToCsvContent(notPassedAxeResults, workItemApiSteps);
             var content = contentUI.Concat(contentAxe);
-            csv.Write(content);
+            csv.Write(contentAxe);
         }
 
         [TestMethod]
