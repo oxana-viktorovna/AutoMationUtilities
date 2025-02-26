@@ -118,7 +118,7 @@ namespace TestRuns.Tests
 
                 if (itemToRemove.outcome != "Passed")
                 {
-                    var areaPath = workItemApiSteps.GetWorkItemNew(Convert.ToInt32(itemToRemove.TestNumber)).fields.SystemAreaPath;
+                    var areaPath = workItemApiSteps.GetWorkItem(Convert.ToInt32(itemToRemove.TestNumber)).fields.AreaPath;
                     var bugs = GetBugsLinkedToTest(itemToRemove.TestNumber);
                     content.AppendLine($"{id},,{getErrorMessage(itemToRemove.Output)},{areaPath},{string.Join(';', bugs.Select(b => b.target.id))}");
                 }
@@ -133,7 +133,7 @@ namespace TestRuns.Tests
 
                 if (itemToRemove.outcome != "Passed")
                 {
-                    var areaPath = workItemApiSteps.GetWorkItemNew(Convert.ToInt32(itemToRemove.TestNumber)).fields.SystemAreaPath;
+                    var areaPath = workItemApiSteps.GetWorkItem(Convert.ToInt32(itemToRemove.TestNumber)).fields.AreaPath;
                     var bugs = GetBugsLinkedToTest(itemToRemove.TestNumber);
                     content.AppendLine($"{id},{getErrorMessage(itemToRemove.Output)}, NOT INCLUDED TO THE RUN,{areaPath},{string.Join(';', bugs.Select(b => b.target.id))}");
                 }
@@ -148,7 +148,7 @@ namespace TestRuns.Tests
                 var testIdName = $"{curTrx.TestNumber},{curTrx.testName}";
                 var prevError = getErrorMessage(prevTrx.Output);
                 var curError = getErrorMessage(curTrx.Output);
-                var areaPath = workItemApiSteps.GetWorkItemNew(Convert.ToInt32(curTrx.TestNumber)).fields.SystemAreaPath;
+                var areaPath = workItemApiSteps.GetWorkItem(Convert.ToInt32(curTrx.TestNumber)).fields.AreaPath;
                 var bugs = GetBugsLinkedToTest(curTrx.TestNumber);
                 var bugsStr = string.Join(';', bugs.Select(b => b.target.id));
                 if (curTrx.outcome != "Passed" && prevTrx.outcome == "Passed")

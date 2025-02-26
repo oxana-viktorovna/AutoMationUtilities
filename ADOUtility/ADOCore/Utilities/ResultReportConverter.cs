@@ -20,7 +20,7 @@ namespace ADOCore.Utilities
 
                 string areaPath = string.Empty;
                 if(workItemApiSteps != null)
-                    areaPath = workItemApiSteps.GetWorkItemNew(System.Convert.ToInt32(testId)).fields.SystemAreaPath;
+                    areaPath = workItemApiSteps.GetWorkItem(System.Convert.ToInt32(testId)).fields.AreaPath;
 
                 var line = new string[] {
                     (i + 1).ToString(),

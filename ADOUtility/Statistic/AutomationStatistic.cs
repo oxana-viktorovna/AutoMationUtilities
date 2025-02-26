@@ -4,8 +4,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharedCore.FileUtilities;
 using SharedCore.Settings;
 using Statistic.Settings;
+using Statistic.Steps;
 using System;
 using System.Collections.Generic;
+using System.Formats.Asn1;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -113,10 +115,10 @@ MODE (MustContain)");
                     ? pbis.FirstOrDefault(i => i.target.id == test.source.id)
                     : pbis.FirstOrDefault(i => i.target.id == task.source.id);
 
-                var pbi_item = workItemApiSteps.GetWorkItemNew(pbi.target.id);
-                var feature_item = workItemApiSteps.GetWorkItemNew(pbi.source.id);
-                var test_item = workItemApiSteps.GetWorkItemNew(test.target.id);
-                content.AppendLine($"{pbi.source.id},{feature_item.fields.SystemTitle},{pbi.target.id},{taskId},{pbi_item.fields.SystemAreaPath},{test.target.id},{test_item.fields.SystemTitle.Replace(",", "_")},{test_item.fields.MicrosoftVSTSCommonPriority},{test_item.fields.SystemIterationPath}");
+                var pbi_item = workItemApiSteps.GetWorkItem(pbi.target.id);
+                var feature_item = workItemApiSteps.GetWorkItem(pbi.source.id);
+                var test_item = workItemApiSteps.GetWorkItem(test.target.id);
+                content.AppendLine($"{pbi.source.id},{feature_item.fields.Title},{pbi.target.id},{taskId},{pbi_item.fields.AreaPath},{test.target.id},{test_item.fields.Title.Replace(",", "_")},{test_item.fields.Priority},{test_item.fields.IterationPath}");
             }
 
             var folder = "C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\TestResultsAnalyse";
@@ -146,17 +148,18 @@ MODE (MustContain)");
         [TestMethod]
         public void Get255Scope()
         {
+            var tag = "255scope";
             var stistic = new StringBuilder("AreaPath \t total \t auto");
             stistic.AppendLine();
             foreach (var areaPath in defaultAreaPathes)
             {
                 stistic.Append(areaPath + "\t");
-                var total_p0 = autoStatSteps.GetNumTests(areaPath, "255scope", 0);
-                var total_p1 = autoStatSteps.GetNumTests(areaPath, "255scope", 1);
+                var total_p0 = autoStatSteps.GetNumTests(areaPath, tag, 0);
+                var total_p1 = autoStatSteps.GetNumTests(areaPath, tag, 1);
                 var total = total_p0 + total_p1;
 
-                var auto_p0 = autoStatSteps.GetNumTests(areaPath, "255scope", 0, true);
-                var auto_p1 = autoStatSteps.GetNumTests(areaPath, "255scope", 1, true);
+                var auto_p0 = autoStatSteps.GetNumTests(areaPath, tag, 0, true);
+                var auto_p1 = autoStatSteps.GetNumTests(areaPath, tag, 1, true);
                 var auto_total = auto_p0 + auto_p1;
 
                 stistic.Append(total + "\t" + auto_total + "\t");

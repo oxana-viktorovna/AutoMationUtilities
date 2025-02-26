@@ -19,13 +19,6 @@ namespace ADOCore.ApiClients
             return JsonSerializer.Deserialize<WorkItem>(response.Content);
         }
 
-        public WorkItemNew GetWorkItemNew(int workItemId)
-        {
-            var response = SendAdoRequest($"wit/workitems/{workItemId}", Method.GET);
-
-            return JsonSerializer.Deserialize<WorkItemNew>(response.Content);
-        }
-
         public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName, int rev)
         {
             var updateRoot = new RootUpdateWorkItem()
