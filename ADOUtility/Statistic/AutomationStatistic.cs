@@ -121,10 +121,9 @@ MODE (MustContain)");
                 content.AppendLine($"{pbi.source.id},{feature_item.fields.Title},{pbi.target.id},{taskId},{pbi_item.fields.AreaPath},{test.target.id},{test_item.fields.Title.Replace(",", "_")},{test_item.fields.Priority},{test_item.fields.IterationPath}");
             }
 
-            var folder = "C:\\Users\\Aksana_Murashka\\Documents\\TRI-SRTR\\TestResultsAnalyse";
             var currentDate = DateTime.Now.ToString("dd-MM-yy");
             var fileName = $"NewFeaturesTests_{currentDate}.csv";
-            var filePath = Path.Combine(folder, fileName);
+            var filePath = Path.Combine(autoStatSettings.SaveFolder, fileName);
             var csv = new CsvWorker(filePath);
             csv.Write(content);
         }
