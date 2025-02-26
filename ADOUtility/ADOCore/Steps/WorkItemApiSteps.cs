@@ -16,10 +16,10 @@ namespace ADOCore.Steps
             client = new WorkItemApiClient(adoSettings);
         }
 
-        public WorkItem? GetWorkItem(int workItemId)
+        public WorkItem? GetWorkItem(int? workItemId)
         => workItemId == 0
             ? null
-            : client.GetWorkItem(workItemId);
+            : client.GetWorkItem(workItemId.Value);
 
         public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
             => client.UpdateAutomationAssociation(workItemId, fullTestName, GetRev(workItemId));
