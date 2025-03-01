@@ -22,5 +22,11 @@
             public const string Contains = "Contains";
             public const string Under = "Under";
         }
+
+        public static class DirectLinkMode
+        {
+            public const string MustContain = "MustContain";
+            public const string DoesNotContain = "DoesNotContain";
+        }
     }
 }

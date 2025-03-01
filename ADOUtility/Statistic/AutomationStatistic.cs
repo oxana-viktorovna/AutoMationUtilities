@@ -37,7 +37,7 @@ namespace Statistic
         [TestMethod]
         public void GetNewFeatureAutomationStat()
         {
-            var wiqlSteps = new WiqlQuerySteps(adoSettings);
+            var wiqlSteps = new WiqlQueryApiSteps(adoSettings);
             var pbis_withIncorrectAdoSet = new List<int> {266895};
 
             var query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")

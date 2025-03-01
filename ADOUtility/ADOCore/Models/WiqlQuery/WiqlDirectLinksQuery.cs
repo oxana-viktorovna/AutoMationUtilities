@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ADOCore.Models.WiqlQuery
 {
@@ -22,6 +23,7 @@ namespace ADOCore.Models.WiqlQuery
         WHERE
             ({string.Join(' ', SourceConditions)})
             AND ({string.Join(' ', TargetConditions)})
+        order by {SelectAttributes.First()}
         MODE ({Mode})";
 
         public object Clone()

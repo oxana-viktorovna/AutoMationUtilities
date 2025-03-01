@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace ADOCore.Steps
 {
-    public class WiqlQuerySteps
+    public class WiqlQueryApiSteps
     {
-        public WiqlQuerySteps(AdoSettings adoSettings)
+        public WiqlQueryApiSteps(AdoSettings adoSettings)
         {
             wiqlApiClient = new WiqlApiClient(adoSettings);
         }

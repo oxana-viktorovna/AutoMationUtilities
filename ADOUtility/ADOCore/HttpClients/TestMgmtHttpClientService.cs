@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ADOCore.HttpClients
 {
@@ -27,6 +28,10 @@ namespace ADOCore.HttpClients
             SuiteUpdateModel suiteUpdateModel = new SuiteUpdateModel(queryString: newQuery);
             _ = client.UpdateTestSuiteAsync(suiteUpdateModel, projectName, testPlanId, testSuiteId).Result;
         }
+
+        public IEnumerable<TestCaseResult> GetTestResult(int testPlanId, int testSuiteId)
+            => GetTestPoints(testPlanId, testSuiteId)
+                .Select(testPoint => client.GetTestResultByIdAsync(projectName, Convert.ToInt32(testPoint.LastTestRun.Id), Convert.ToInt32(testPoint.LastResult.Id)).Result);
 
         public List<TestPoint> GetTestPoints(int testPlanId, int testSuiteId)
             => client.GetPointsAsync(projectName, testPlanId, testSuiteId).Result;

@@ -1,4 +1,8 @@
 ﻿using ADOCore;
+using ADOCore.ApiClients;
+using ADOCore.HttpClients;
+using ADOCore.Models;
+using ADOCore.Models.WiqlQuery;
 using ADOCore.Steps;
 using ADOCore.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,15 +23,17 @@ namespace TestRuns.Tests
         private AdoSettings adoSettings;
         private TestPlanApiSteps apiSteps;
         private TestRunTestSettings testSettings;
+        private TestMgmtHttpClientService testMgmtService;
 
         private const int TestPlanId = 199475;
-        private Dictionary<int, string> NightlySuits = new ()
+        private Dictionary<TestSuiteType, int> NightlySuits = new()
         {
-            { 265004, "UI" },
-            { 264947, "NonParallel" },
-            { 279185, "Analytics" },
-            { 277588, "CDW" },
-            { 274457, "NewRa" }
+            { TestSuiteType.UI, 265004 },
+            { TestSuiteType.NonParallel,264947},
+            { TestSuiteType.Analytics, 279185 },
+            { TestSuiteType.CDW, 277588 },
+            { TestSuiteType.NewRA, 274457 },
+            { TestSuiteType.Axe, 278993 }
         };
 
         private Dictionary<int, string> MajorSuits = new()
@@ -55,8 +61,98 @@ namespace TestRuns.Tests
             var adoSettingsReader = new SettingsReader("ADOconfig.json");
             adoSettings = new AdoSettings(adoSettingsReader);
             apiSteps = new TestPlanApiSteps(adoSettings);
+            testMgmtService = new TestMgmtHttpClientService(adoSettings);
             var testSettingsReader = new SettingsReader("TestRunTestConfig.json");
             testSettings = new TestRunTestSettings(testSettingsReader);
+        }
+
+        [TestMethod]
+        public void UpdateNightlySuitesQueryStrings()
+        {
+            var notPassedIds = new List<string>();
+
+            foreach (var suite in NightlySuits)
+            {
+                if (suite.Key == TestSuiteType.Axe)
+                {
+                    notPassedIds = testMgmtService.GetTestResult(TestPlanId, suite.Value)
+                        .Where(r => r.ErrorMessage != null && !r.ErrorMessage.Contains("Accessibility violations"))
+                        .Select(r => r.TestCase.Id).ToList();
+                }
+                else
+                {
+                    notPassedIds = testMgmtService.GetTestPoints(TestPlanId, suite.Value)
+                        .Where(testPoint => !testPoint.Outcome.Equals("passed", StringComparison.InvariantCultureIgnoreCase))
+                        .Select(p => p.TestCase.Id).ToList();
+                }
+                var queryBuilder = GetNightlySuiteQueryBuilder(suite.Key);
+                var newQuery = queryBuilder
+                    .AddSourceCondition(WiqlConsnt.Conjunction.And, "[System.Id]", WiqlConsnt.Operator.In, $"({string.Join(",", notPassedIds)})")
+                    .Build();
+
+                testMgmtService.UpdateSuiteQueryString(TestPlanId, suite.Value, newQuery);
+            }
+        }
+
+        private WiqlDirectLinksQueryBuilder GetNightlySuiteQueryBuilder(TestSuiteType suite)
+        {
+            var queryBuilder = new WiqlDirectLinksQueryBuilder(WiqlConsnt.DirectLinkMode.DoesNotContain)
+                .AddAttributesToGet("[System.Id]")
+                .AddAttributesToGet(WorkItemFields.GetAdoName("Type"))
+                .AddAttributesToGet(WorkItemFields.GetAdoName("Title"))
+                .AddAttributesToGet(WorkItemFields.GetAdoName("Priority"))
+                .AddAttributesToGet(WorkItemFields.GetAdoName("AssignedTo"))
+                .AddAttributesToGet(WorkItemFields.GetAdoName("AreaPath"))
+
+                .AddSourceCondition("[Source].[System.TeamProject] = @project")
+                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Test Case")
+                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationStatus"), WiqlConsnt.Operator.Equal, "Automated")
+                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.NotEqual, "Closed")
+                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestStorage"), WiqlConsnt.Operator.Contains, "Tracker.Testing.Automation")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Tags]", WiqlConsnt.Operator.Contains, "RMI")
+
+                .AddTargetCondition("[Target].[System.TeamProject] = @project")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Bug")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, "[Custom.HighestAffectedEnv]", WiqlConsnt.Operator.NotEqual, "6 - Feature")
+                .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('New', 'Approved', 'Commited', 'In Development', 'Code Review', 'Ready To Test', 'In Testing', 'Ready For Merge')");
+
+            switch (suite)
+            {
+                case TestSuiteType.UI:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "NonParallel")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Axe_")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Tags]", WiqlConsnt.Operator.Contains, "Analytics");
+                    break;
+                case TestSuiteType.NonParallel:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "NonParallel")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Axe_")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Tags]", WiqlConsnt.Operator.Contains, "Analytics");
+                    break;
+                case TestSuiteType.Analytics:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, "[System.Tags]", WiqlConsnt.Operator.Contains, "Analytics")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Axe_")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Negative");
+                    break;
+                case TestSuiteType.CDW:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "CDW")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Negative");
+                    break;
+                case TestSuiteType.NewRA:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "NewRa")
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Negative");
+                    break;
+                case TestSuiteType.Axe:
+                    queryBuilder
+                        .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestName"), WiqlConsnt.Operator.Contains, "Axe_");
+                    break;
+            }
+
+            return queryBuilder;
         }
 
         [TestMethod]
@@ -74,7 +170,7 @@ namespace TestRuns.Tests
             var ids_durations = new Dictionary<int, double>();
             foreach (var suite in NightlySuits)
             {
-                var ids_durations_suite = apiSteps.GetSuitePassedTestsDuration(TestPlanId, suite.Key);
+                var ids_durations_suite = apiSteps.GetSuitePassedTestsDuration(TestPlanId, suite.Value);
                 ids_durations.ConcatenateWith2(ids_durations_suite);
             }
 
@@ -94,7 +190,7 @@ namespace TestRuns.Tests
             }
             else
             {
-                content.AppendLine($"{string.Join(',',previous_results[0])},{currentDate}");
+                content.AppendLine($"{string.Join(',', previous_results[0])},{currentDate}");
 
                 for (int i = 1; i < previous_results.Count; i++)
                 {
@@ -107,7 +203,7 @@ namespace TestRuns.Tests
                         ids_durations.Remove(idDurationPair.Key);
                     }
 
-                    content.AppendLine($"{string.Join(',',previous_results[i])},{elementToAdd}");
+                    content.AppendLine($"{string.Join(',', previous_results[i])},{elementToAdd}");
                 }
 
                 var numberOfPreviousRuns = previous_results[0].Count() - 1;
@@ -128,10 +224,12 @@ namespace TestRuns.Tests
 
             foreach (var suite in NightlySuits)
             {
-                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Key);
+                if (suite.Key == TestSuiteType.Axe)
+                    result.AppendLine("Axe: !!! To Get non axe failures Ids Run GetAxeTestResultsByBuildId_NotPassed_Csv()");
+
+                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Value);
                 result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
             }
-            result.AppendLine("Axe: !!! To Get non axe failures Ids Run GetAxeTestResultsByBuildId_NotPassed_Csv()");
 
             Assert.Inconclusive(Environment.NewLine + result.ToString());
         }

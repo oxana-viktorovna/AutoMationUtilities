@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using static ADOCore.Models.WiqlQuery.WiqlConsnt;
 
 namespace ADOCore.Models.WiqlQuery
 {
     public class WiqlDirectLinksQueryBuilder : ICloneable
     {
-        public WiqlDirectLinksQueryBuilder()
+        public WiqlDirectLinksQueryBuilder(string mode = DirectLinkMode.MustContain)
         {
             query = new WiqlDirectLinksQuery();
             query.SelectAttributes = new List<string>();
             query.SourceConditions = new List<string>();
             query.TargetConditions = new List<string>();
-            query.Mode = "MustContain";
+            query.Mode = mode;
         }
 
         private WiqlDirectLinksQuery query;

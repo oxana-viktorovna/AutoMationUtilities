@@ -230,7 +230,7 @@ namespace TestRuns.Tests
             if (testNumber == null)
                 return null;
 
-            var wiqlSteps = new WiqlQuerySteps(adoSettings);
+            var wiqlSteps = new WiqlQueryApiSteps(adoSettings);
             var query = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
                 .AddSourceCondition(null, "[System.Id]", WiqlConsnt.Operator.Equal, testNumber)
                 .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Bug")
