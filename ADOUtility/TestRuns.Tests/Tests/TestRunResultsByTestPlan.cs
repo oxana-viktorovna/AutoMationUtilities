@@ -1,5 +1,4 @@
 ﻿using ADOCore;
-using ADOCore.ApiClients;
 using ADOCore.HttpClients;
 using ADOCore.Models;
 using ADOCore.Models.WiqlQuery;
@@ -36,23 +35,31 @@ namespace TestRuns.Tests
             { TestSuiteType.Axe, 278993 }
         };
 
-        private Dictionary<int, string> MajorSuits = new()
+        private Dictionary<TestSuiteType, int> MajorSuitsUS = new()
         {
-            { 280523, "US Analytics" },
-            { 271702, "US Full" },
-            { 271703, "UK Full" },
-            { 271704, "US NonParallel" },
-            { 271705, "UK NonParallel" },
-            { 278584, "RMI" }
+            { TestSuiteType.Analytics, 280523 },
+            { TestSuiteType.UI, 271702 },
+            { TestSuiteType.NonParallel, 271704 },
+            { TestSuiteType.RMI, 278584 }
         };
 
-        private Dictionary<int, string> MinorSuits = new()
+        private Dictionary<TestSuiteType, int> MajorSuitsUK = new()
         {
-            { 280538, "US Analytics" },
-            { 266785, "US Full" },
-            { 266783, "UK Full" },
-            { 266787, "US NonParallel" },
-            { 266788, "UK NonParallel" }
+            { TestSuiteType.UI, 271703 },
+            { TestSuiteType.NonParallel, 271705 }
+        };
+
+        private Dictionary<TestSuiteType, int> MinorSuitsUS = new()
+        {
+            { TestSuiteType.Analytics, 280538 },
+            { TestSuiteType.UI, 266785 },
+            { TestSuiteType.NonParallel, 266787 }
+        };
+
+        private Dictionary<TestSuiteType, int> MinorSuitsUK = new()
+        {
+            { TestSuiteType.UI, 266783 },
+            { TestSuiteType.NonParallel, 266788 }
         };
 
         [TestInitialize]
@@ -238,9 +245,14 @@ namespace TestRuns.Tests
         public void GetSuiteFailedTestIdsMajorRelease()
         {
             var result = new StringBuilder();
-            foreach (var suite in MajorSuits)
+            foreach (var suite in MajorSuitsUS)
             {
-                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Key);
+                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Value);
+                result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
+            }
+            foreach (var suite in MajorSuitsUK)
+            {
+                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Value);
                 result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
             }
 
@@ -251,9 +263,14 @@ namespace TestRuns.Tests
         public void GetSuiteFailedTestIdsMinorRelease()
         {
             var result = new StringBuilder();
-            foreach (var suite in MinorSuits)
+            foreach (var suite in MinorSuitsUS)
             {
-                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Key);
+                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Value);
+                result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
+            }
+            foreach (var suite in MinorSuitsUK)
+            {
+                var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suite.Value);
                 result.AppendLine(suite.Value + ": " + string.Join(",", testsIds));
             }
 
