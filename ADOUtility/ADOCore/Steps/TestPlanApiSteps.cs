@@ -1,5 +1,4 @@
-﻿using ADOCore;
-using ADOCore.ApiClients;
+﻿using ADOCore.ApiClients;
 using ADOCore.Models;
 using System;
 using System.Collections.Generic;

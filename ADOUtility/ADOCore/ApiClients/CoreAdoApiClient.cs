@@ -9,13 +9,13 @@ namespace ADOCore.ApiClients
     {
         public CoreAdoApiClient(AdoSettings adoSettings)
         {
-            var clientOptions = new RestClientOptions(adoSettings.BaseUrl)
+            var clientOptions = new RestClientOptions(adoSettings.BaseUrlAPI)
             {
                 Authenticator = new HttpBasicAuthenticator("", adoSettings.Password),
                 Timeout = Timeout.InfiniteTimeSpan
             };
             client = new RestClient(clientOptions);
-            baseUrl = adoSettings.BaseUrl;
+            baseUrl = adoSettings.BaseUrlAPI;
         }
 
         protected readonly RestClient client;
