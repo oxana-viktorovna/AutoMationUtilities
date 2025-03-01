@@ -12,7 +12,7 @@ namespace ADOCore.ApiClients
 
         public GetBuildResponce GetBuild(int buildId)
         {
-            var response = SendAdoRequest($"build/builds/{buildId}", Method.GET);
+            var response = SendAdoRequest($"build/builds/{buildId}", Method.Get);
 
             return JsonSerializer.Deserialize<GetBuildResponce>(response.Content);
         }

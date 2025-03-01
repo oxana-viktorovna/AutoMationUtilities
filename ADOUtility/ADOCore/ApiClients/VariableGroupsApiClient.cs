@@ -18,7 +18,7 @@ namespace ADOCore.ApiClietns
             {
                 ("groupName", varGroupName)
             };
-            var response = SendAdoRequest("distributedtask/variablegroups", Method.GET, paramseters, "6.0-preview.2");
+            var response = SendAdoRequest("distributedtask/variablegroups", Method.Get, paramseters, "6.0-preview.2");
             var varGroup = JsonConvert.DeserializeObject<VariableGroup>(response.Content);
 
             return varGroup;

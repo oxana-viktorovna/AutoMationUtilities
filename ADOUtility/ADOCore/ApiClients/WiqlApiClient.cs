@@ -13,7 +13,7 @@ namespace ADOCore.ApiClietns
 
         public WorkItemResponce PostWiqlQuery(string query)
         { 
-            var responce = SendAdoRequest("wit/wiql", Method.POST, body: new WiqlQueryRequest(query));
+            var responce = SendAdoRequest("wit/wiql", Method.Post, body: new WiqlQueryRequest(query));
             if (responce.StatusCode != System.Net.HttpStatusCode.OK)
                 throw new System.Exception(responce.Content);
 
@@ -22,7 +22,7 @@ namespace ADOCore.ApiClietns
         
         public WiqlHierarchyLinks_QueryResponce PostWiqlQueryLinkedItems(string query)
         {
-            var responce = SendAdoRequest("wit/wiql", Method.POST, body: new WiqlQueryRequest(query));
+            var responce = SendAdoRequest("wit/wiql", Method.Post, body: new WiqlQueryRequest(query));
             if (responce.StatusCode != System.Net.HttpStatusCode.OK)
                 throw new System.Exception(responce.Content);
 

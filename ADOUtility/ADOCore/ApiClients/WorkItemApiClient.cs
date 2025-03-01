@@ -14,12 +14,12 @@ namespace ADOCore.ApiClients
 
         public WorkItem GetWorkItem(int workItemId)
         {
-            var response = SendAdoRequest($"wit/workitems/{workItemId}", Method.GET);
+            var response = SendAdoRequest($"wit/workitems/{workItemId}", Method.Get);
 
             return JsonSerializer.Deserialize<WorkItem>(response.Content);
         }
 
-        public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName, int rev)
+        public RestResponse UpdateAutomationAssociation(int workItemId, string fullTestName, int rev)
         {
             var updateRoot = new RootUpdateWorkItem()
             {
@@ -62,7 +62,7 @@ namespace ADOCore.ApiClients
             return SendAdoPatchRequest($"wit/workitems/{workItemId}", body, "application/json-patch+json");
         }
 
-        public IRestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds, int rev)
+        public RestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds, int rev)
         {
             var body = new List<object>();
             var updateRoot = new RootUpdateWorkItem()

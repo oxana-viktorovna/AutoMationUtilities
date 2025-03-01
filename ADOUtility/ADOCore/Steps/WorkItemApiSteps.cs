@@ -21,10 +21,10 @@ namespace ADOCore.Steps
             ? null
             : client.GetWorkItem(workItemId.Value);
 
-        public IRestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
+        public RestResponse UpdateAutomationAssociation(int workItemId, string fullTestName)
             => client.UpdateAutomationAssociation(workItemId, fullTestName, GetRev(workItemId));
 
-        public IRestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
+        public RestResponse AddRelatedLinksToWorkItem(int workItemId, IEnumerable<int> linkIds)
             => client.AddRelatedLinksToWorkItem(workItemId, linkIds, GetRev(workItemId));
 
         private int GetRev(int workItemId)

@@ -20,7 +20,7 @@ namespace ADOCore.ApiClients
                 ("buildId", buildId.ToString())
             };
 
-            var response = SendAdoRequest("test/ResultDetailsByBuild", Method.GET, parameters, version: "7.0-preview");
+            var response = SendAdoRequest("test/ResultDetailsByBuild", Method.Get, parameters, version: "7.0-preview");
             var resultDetails = JsonSerializer.Deserialize<ResultDetailsByBuildResponce>(response.Content);
             var allids = resultDetails.resultsForGroup.SelectMany(rg => rg.results.Select(r => Convert.ToInt32(r.testRun.id)));
             var ids = allids.Distinct().ToList();

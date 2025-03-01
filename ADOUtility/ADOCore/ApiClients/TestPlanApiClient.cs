@@ -36,7 +36,7 @@ namespace ADOCore.ApiClients
             if (!string.IsNullOrEmpty(currentContinuationToken))
                 param.Add(("continuationToken", currentContinuationToken));
             
-            var response = SendAdoRequest(url, Method.GET, param, version: "7.1-preview.2");
+            var response = SendAdoRequest(url, Method.Get, param, version: "7.1-preview.2");
             var content = JsonSerializer.Deserialize<TestPointResponse>(response.Content);
             nextContinuationToken = response.Headers
                                     .Where(header => header.Name.Equals("x-ms-continuationtoken", StringComparison.OrdinalIgnoreCase))
