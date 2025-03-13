@@ -40,13 +40,13 @@ namespace TestRuns.Tests
         private TestRunApiSteps apiStepsNew;
         private BuildApiSteps buildApiSteps;
         private WorkItemApiSteps workItemApiSteps;
-        private const int BuildId = 697498;
+        private const int BuildId = 700360;
 
         [TestMethod]
         public void GetDiffAxeResults_Csv()
         {
-            var previousBuildIds = new List<int> { 697201, 697384 }; // first original run, then rerun
-            var currentBuildIds = new List<int> { 697201, 697639 };
+            var previousBuildIds = new List<int> { 700301, 700360, 700437 }; // first original run, then rerun
+            var currentBuildIds = new List<int> { 700762, 700899 };
             var currentDate = DateTime.Now.ToString("dd-MM-yy-HH-mm-ss");
             var fileName = $"Axe_Diff_{currentDate}";
             var filePath = Path.Combine(testSettings.SaveFolder, fileName + ".csv");

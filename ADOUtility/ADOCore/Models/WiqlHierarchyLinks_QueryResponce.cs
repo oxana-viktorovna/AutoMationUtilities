@@ -36,20 +36,7 @@ namespace ADOCore.Models
     public class Workitemrelation
     {
         public string rel { get; set; }
-        public Source source { get; set; }
-        public Target target { get; set; }
+        public Workitem_Short source { get; set; }
+        public Workitem_Short target { get; set; }
     }
-
-    public class Source
-    {
-        public int id { get; set; }
-        public string url { get; set; }
-    }
-
-    public class Target
-    {
-        public int id { get; set; }
-        public string url { get; set; }
-    }
-
 }

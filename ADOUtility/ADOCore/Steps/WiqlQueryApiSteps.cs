@@ -20,5 +20,12 @@ namespace ADOCore.Steps
             return response.workItemRelations.Where(w => w.rel != null).ToArray();
         }
 
+        public Workitem_Short[] GetItems(string? query)
+        {
+            var response = wiqlApiClient.PostWiqlQuery(query);
+
+            return response.workItems;
+        }
+
     }
 }

@@ -1,9 +1,6 @@
-﻿
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using static NPOI.HSSF.UserModel.HeaderFooter;
 
 public class WorkItem
 {
