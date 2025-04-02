@@ -237,6 +237,7 @@ namespace TestRuns.Tests
                 .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationStatus"), WiqlConsnt.Operator.Equal, "Automated")
                 .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.NotEqual, "Closed")
                 .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomatedTestStorage"), WiqlConsnt.Operator.Contains, "Tracker.Testing.Automation")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AutomatedTestType"), WiqlConsnt.Operator.Contains, "feature")
                 .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Tags]", WiqlConsnt.Operator.Contains, "RMI")
 
                 .AddTargetCondition("[Target].[System.TeamProject] = @project")
