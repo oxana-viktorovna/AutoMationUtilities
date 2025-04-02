@@ -28,6 +28,9 @@ public class WorkItemFields
     [JsonPropertyName("System.State")]
     public string State { get; set; }
 
+    [JsonPropertyName("Microsoft.VSTS.Scheduling.Effort")]
+    public double Effort { get; set; }
+
     [JsonPropertyName("System.Reason")]
     public string Reason { get; set; }
 
@@ -66,6 +69,9 @@ public class WorkItemFields
 
     [JsonPropertyName("Microsoft.VSTS.TCM.AutomatedTestName")]
     public string AutomatedTestName { get; set; }
+
+    [JsonPropertyName("Microsoft.VSTS.TCM.AutomatedTestType")]
+    public string AutomatedTestType { get; set; }
 
     [JsonPropertyName("Microsoft.VSTS.TCM.AutomatedTestStorage")]
     public string AutomatedTestStorage { get; set; }

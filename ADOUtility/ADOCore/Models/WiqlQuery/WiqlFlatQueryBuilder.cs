@@ -55,6 +55,9 @@ namespace ADOCore.Models.WiqlQuery
         public WiqlFlatQueryBuilder AddStateCondition(string state, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
             => AddCondition("System.State", state, comparisonOperator, conjunction);
 
+        public WiqlFlatQueryBuilder AddTagsContainsCondition(string state, string comparisonOperator = WiqlConsnt.Operator.Contains, string conjunction = WiqlConsnt.Conjunction.And)
+            => AddCondition("System.Tags", state, comparisonOperator, conjunction);
+
         public WiqlFlatQueryBuilder AddCondition(string parameter, string value, string comparisonOperator, string conjunction)
             => AddCondition($"{conjunction} {parameter} {comparisonOperator} '{value}'");
         
