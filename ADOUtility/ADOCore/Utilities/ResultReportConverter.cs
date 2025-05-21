@@ -19,8 +19,12 @@ namespace ADOCore.Utilities
                 var error = GetErrorMessage(results[i]);
 
                 string areaPath = string.Empty;
-                if(workItemApiSteps != null)
-                    areaPath = workItemApiSteps.GetWorkItem(System.Convert.ToInt32(testId)).fields.AreaPath;
+                if (workItemApiSteps != null)
+                {
+                    var converted = Int32.TryParse(testId, out int intTestId);
+                    if(converted)
+                        areaPath = workItemApiSteps.GetWorkItem(intTestId).fields.AreaPath;
+                }
 
                 var line = new string[] {
                     (i + 1).ToString(),
