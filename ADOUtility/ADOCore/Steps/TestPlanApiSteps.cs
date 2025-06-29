@@ -45,6 +45,14 @@ namespace ADOCore.Steps
             return result;
         }
 
+        private IEnumerable<int> GetSuitePassedTestIds(int testPlanId, int suiteId)
+        {
+            var response = client.GetSuiteTestPoints(testPlanId, suiteId);
+            var passed = response.Where(testPoint => testPoint.results.outcome == "passed")
+                .Select(testPoint => testPoint.testCaseReference.id);
+
+            return passed;
+        }
         private IEnumerable<TestPoint> GetSuiteNotPassedTestPoints(int testPlanId, int suiteId)
         {
             var response = client.GetSuiteTestPoints(testPlanId, suiteId);

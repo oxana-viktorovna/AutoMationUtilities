@@ -35,36 +35,36 @@ namespace ADOCore.Models.WiqlQuery
                 .AddStateCondition("Closed", WiqlConsnt.Operator.NotEqual);
 
         public WiqlFlatQueryBuilder AddTypeCondition(string type, string comparisonOperator = WiqlConsnt.Operator.Equal, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition(WorkItemFields.GetAdoName("Type"), type, comparisonOperator, conjunction);
+            => AddCondition(conjunction, WorkItemFields.GetAdoName("Type"), comparisonOperator, type);
 
         public WiqlFlatQueryBuilder AddSinglePriorityCondition(int priority, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition(WorkItemFields.GetAdoName("Priority"), priority, comparisonOperator, conjunction);
+            => AddCondition(conjunction, WorkItemFields.GetAdoName("Priority"), comparisonOperator, priority);
 
         public WiqlFlatQueryBuilder AddInPriorityCondition(IEnumerable<int> priorities, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition(WorkItemFields.GetAdoName("Priority"), priorities, WiqlConsnt.Operator.In, conjunction);
+            => AddCondition(conjunction, WorkItemFields.GetAdoName("Priority"), WiqlConsnt.Operator.In, priorities);
 
         public WiqlFlatQueryBuilder AddAutomatedTestStorageCondition(string value, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition(WorkItemFields.GetAdoName("AutomatedTestStorage"), value, comparisonOperator, conjunction);
+            => AddCondition(conjunction, WorkItemFields.GetAdoName("AutomatedTestStorage"), comparisonOperator, value);
 
         public WiqlFlatQueryBuilder AddAutomationStatusCondition(string automatedStatus, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition(WorkItemFields.GetAdoName("AutomationStatus"), automatedStatus, comparisonOperator, conjunction);
+            => AddCondition(conjunction, WorkItemFields.GetAdoName("AutomationStatus"), comparisonOperator, automatedStatus);
 
         public WiqlFlatQueryBuilder AddTitleCondition(string title, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition("System.Title", title, comparisonOperator, conjunction);
+            => AddCondition(conjunction, "System.Title", comparisonOperator, title);
 
         public WiqlFlatQueryBuilder AddStateCondition(string state, string comparisonOperator, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition("System.State", state, comparisonOperator, conjunction);
+            => AddCondition(conjunction, "System.State", comparisonOperator, state);
 
         public WiqlFlatQueryBuilder AddTagsContainsCondition(string state, string comparisonOperator = WiqlConsnt.Operator.Contains, string conjunction = WiqlConsnt.Conjunction.And)
-            => AddCondition("System.Tags", state, comparisonOperator, conjunction);
+            => AddCondition(conjunction, "System.Tags", comparisonOperator, state);
 
-        public WiqlFlatQueryBuilder AddCondition(string parameter, string value, string comparisonOperator, string conjunction)
+        public WiqlFlatQueryBuilder AddCondition(string conjunction, string parameter, string comparisonOperator,string value)
             => AddCondition($"{conjunction} {parameter} {comparisonOperator} '{value}'");
-        
-        public WiqlFlatQueryBuilder AddCondition(string parameter, int value, string comparisonOperator, string conjunction)
+
+        public WiqlFlatQueryBuilder AddCondition(string conjunction, string parameter, string comparisonOperator, int value)
             => AddCondition($"{conjunction} {parameter} {comparisonOperator} {value}");
 
-        public WiqlFlatQueryBuilder AddCondition(string parameter, IEnumerable<int> values, string comparisonOperator, string conjunction)
+        public WiqlFlatQueryBuilder AddCondition(string conjunction, string parameter, string comparisonOperator, IEnumerable<int> values)
             => AddCondition($"{conjunction} {parameter} {comparisonOperator} ({String.Join(",", values)})");
 
         public WiqlFlatQueryBuilder AddCondition(string condition)

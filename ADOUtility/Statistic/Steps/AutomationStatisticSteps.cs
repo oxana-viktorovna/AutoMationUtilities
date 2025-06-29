@@ -2,7 +2,12 @@
 using ADOCore.ApiClietns;
 using ADOCore.Models.WiqlQuery;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Statistic.Steps
 {
@@ -36,9 +41,9 @@ namespace Statistic.Steps
                    .AddAttributesToGet(WorkItemFields.GetAdoName("AutomationStatus"))
                    .AddTypeCondition("Test Case", conjunction: null);
             if (areaPath != null)
-                queryBuilder.AddCondition(WorkItemFields.GetAdoName("AreaPath"), areaPath, WiqlConsnt.Operator.Under, WiqlConsnt.Conjunction.And);
+                queryBuilder.AddCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AreaPath"), WiqlConsnt.Operator.Under, areaPath);
             if (tag != null)
-                queryBuilder.AddCondition("[System.Tags]",tag, WiqlConsnt.Operator.Contains, WiqlConsnt.Conjunction.And);
+                queryBuilder.AddCondition(WiqlConsnt.Conjunction.And, "[System.Tags]", WiqlConsnt.Operator.Contains, tag);
             if (priority != null)
                 queryBuilder.AddSinglePriorityCondition(priority.Value, WiqlConsnt.Operator.Equal);
             if (automated)
@@ -68,7 +73,7 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        public int GetAutomatedTestCountByPriority(IEnumerable<int> priorities)
+        public int GetAutomatedTestCountByPriorities(params int[] priorities)
         {
             var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
             var query = builder
@@ -83,17 +88,31 @@ namespace Statistic.Steps
             return queryResult.workItems.Length;
         }
 
-        public int GetTestCountByPriority(int priority)
+        public int GetTestCountByPriority(int priority, params string[] withTags)
         {
-            var builder = (WiqlFlatQueryBuilder)baseQueryBuilder.Clone();
-            var query = builder
+            var builder = (WiqlFlatQueryBuilder)(baseQueryBuilder.Clone());
+            var baseQuery = builder
                 .AddStateCondition("Closed", WiqlConsnt.Operator.NotEqual)
                 .AddSinglePriorityCondition(priority, WiqlConsnt.Operator.Equal)
-                .AddTitleCondition("a11y", WiqlConsnt.Operator.Contains, WiqlConsnt.Conjunction.AndNot)
-                .AddAsOf(asOf)
-                .Build();
+                .AddTitleCondition("a11y", WiqlConsnt.Operator.Contains, WiqlConsnt.Conjunction.AndNot);
+
+            if (withTags.Any())
+                foreach (var tag in withTags)
+                    baseQuery.AddTagsContainsCondition(tag);
+
+            var query = baseQuery.AddAsOf(asOf).Build();
 
             var queryResult = wiqlApiClient.PostWiqlQuery(query);
+
+            return queryResult.workItems.Length;
+        }
+
+        public int GetTestCount(WiqlFlatQueryBuilder queryBuilder)
+        {
+            var query = queryBuilder.AddAsOf(asOf).Build();
+
+            var queryResult = wiqlApiClient.PostWiqlQuery(query);
+            var ids = string.Join(",", queryResult.workItems.Select(i => i.id));
 
             return queryResult.workItems.Length;
         }
@@ -111,5 +130,6 @@ namespace Statistic.Steps
 
             return queryResult.workItems.Length;
         }
+
     }
 }

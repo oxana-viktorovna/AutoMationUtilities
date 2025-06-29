@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static ADOCore.Models.WiqlQuery.WiqlConsnt;
+using Resources = SharedCore.ResourcesUtilities.ResourcesUtilities;
 
 namespace TestRuns.Tests
 {
@@ -122,29 +124,31 @@ namespace TestRuns.Tests
 
             #region new Feature
 
-            var newFeatures = new List<int>
-            {
-                168820,172360,189893,256416,256439,258296,259741,260120,261436,262320,266672,271591,
-                273741,273602,274744,274941,278275,282026,274759,282026,282760,278290,285494,
-                286444,287226,289149,289386,289550,289749,289871,290251,292928,293450
-            };
+            var newFeatures = Resources.GetNewFeaturesIds(DateTime.Today);
 
             var newFeaturePBIsQuery = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
                 .AddTargetCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Feature")
                 .AddTargetCondition(WiqlConsnt.Conjunction.And, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeatures) + ")")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "on hold")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "On-Hold")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("AreaPath"), WiqlConsnt.Operator.Under, "Tracker\\Firefly")
+                .AddTargetCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('In Design', 'New')")
                 .AddSourceCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.In, "('Product Backlog Item','Bug')")
                 .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('Removed', 'New', 'Approved')")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "on hold")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "System.Tags", WiqlConsnt.Operator.Contains, "On-Hold")
                 .Build();
-            var newFeaturepbis = wiqlSteps.GetLinkedItems(newFeaturePBIsQuery);
-            var newFeaturepbiIds = newFeaturepbis.Select(pbi => pbi.source.id).Distinct();
+            var newFeaturePbis = wiqlSteps.GetLinkedItems(newFeaturePBIsQuery);
+            var newFeaturePbiIds = newFeaturePbis.Select(pbi => pbi.source.id).Distinct();
 
             var newFeatureTestsQuery = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
-                .AddTargetCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeaturepbiIds) + ")")
+                .AddTargetCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeaturePbiIds) + ")")
                 .AddSourceCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Test Case")
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.In, "('Removed', 'New', 'Approved')")
                 .Build();
-            var newFeaturetests = wiqlSteps.GetLinkedItems(newFeatureTestsQuery);
-            var newFeaturetestIds = newFeaturetests.Select(test => test.source.id).Distinct();
-            var newFeatureTestsQueryString = GetToAutomateSuiteQuery(newFeaturetestIds, new List<int> { 0, 1});
+            var newFeatureTests = wiqlSteps.GetLinkedItems(newFeatureTestsQuery);
+            var newFeatureTestIds = newFeatureTests.Select(test => test.source.id).Distinct();
+            var newFeatureTestsQueryString = GetToAutomateSuiteQuery(newFeatureTestIds, new List<int> { 0, 1});
 
             testMgmtService.UpdateSuiteQueryString(TestPlanId, 296683, newFeatureTestsQueryString);
 
@@ -152,55 +156,27 @@ namespace TestRuns.Tests
 
             #region regession
 
-            var non2025inactiveFeatures = new List<int>
-            {
-                239598
-            };
-
-            var inactiveFeaturesQuery = new WiqlFlatQueryBuilder().AddAttributesToGet("[System.Id]")
-                .AddCondition(WorkItemFields.GetAdoName("Type"), "Feature", WiqlConsnt.Operator.Equal, null)
-                .AddCondition($"{WiqlConsnt.Conjunction.And} [System.TeamProject] = 'Tracker'")
-                .AddCondition(WorkItemFields.GetAdoName("IterationPath"), "Tracker\\2025", WiqlConsnt.Operator.Under, WiqlConsnt.Conjunction.And)
-                .AddCondition($"{WiqlConsnt.Conjunction.And}(")
-                .AddCondition($"{WorkItemFields.GetAdoName("State")} {WiqlConsnt.Operator.In} ('Removed','In Design','New')")
-                .AddCondition("System.Tags", "on hold", WiqlConsnt.Operator.Contains, WiqlConsnt.Conjunction.Or)
-                .AddCondition("System.Tags", "On-Hold", WiqlConsnt.Operator.Contains, WiqlConsnt.Conjunction.Or)
-                .AddCondition(")")
+            var regQueryP0 = GetBaseToAutomateSuiteQueryBuilder(new List<int> { 0 })
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeatureTestIds) + ")")
                 .Build();
-            var inactiveFeatures = wiqlSteps.GetItems(inactiveFeaturesQuery);
-            var inactiveFeaturesIds = inactiveFeatures.Select(f => f.id).Distinct().Concat(non2025inactiveFeatures);
-            var correctF = inactiveFeaturesIds.FirstOrDefault(f => f == 256438);
-
-            var inactiveFeaturesPBIsQuery = new WiqlDirectLinksQueryBuilder().AddAttributesToGet("[System.Id]")
-                .AddSourceCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.In, "('Product Backlog Item','Bug')")
-                .AddTargetCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', inactiveFeaturesIds) + ")")
-                .Build();
-            var inactiveFeaturesPbis = wiqlSteps.GetLinkedItems(inactiveFeaturesPBIsQuery);
-            var inactiveFeaturesPbiIds = inactiveFeaturesPbis.Select(pbi => pbi.source.id).Distinct();
-            var correctP = inactiveFeaturesPbiIds.FirstOrDefault(p => p == 259284);
-
-            var regressionTestsQuery = new WiqlDirectLinksQueryBuilder(WiqlConsnt.DirectLinkMode.DoesNotContain).AddAttributesToGet("[System.Id]")
-                .AddSourceCondition(null, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Test Case")
-                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeaturetestIds) + ")")
-                .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Priority"), WiqlConsnt.Operator.In, "(0,1)")
-                .AddTargetCondition(null, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', inactiveFeaturesPbiIds) + ")")
-                .Build();
-            var regTests = wiqlSteps.GetItems(regressionTestsQuery);
-            var regTestIds = regTests.Select(test => test.id).Distinct();
-            var correctT = regTestIds.FirstOrDefault(t => t == 272067);
-
-            var regQueryP0 = GetToAutomateSuiteQuery(regTestIds, new List<int> { 0 });
             testMgmtService.UpdateSuiteQueryString(TestPlanId, 296687, regQueryP0);
 
-            var regQueryP1 = GetToAutomateSuiteQuery(regTestIds, new List<int> { 1 });
+            var regQueryP1 = GetBaseToAutomateSuiteQueryBuilder(new List<int> { 1 })
+                .AddSourceCondition(WiqlConsnt.Conjunction.AndNot, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', newFeatureTestIds) + ")")
+                .Build();
             testMgmtService.UpdateSuiteQueryString(TestPlanId, 296688, regQueryP1);
 
             #endregion regession
         }
 
         private string GetToAutomateSuiteQuery(IEnumerable<int> testIds, IEnumerable<int> priorities)
-            => new WiqlDirectLinksQueryBuilder(WiqlConsnt.DirectLinkMode.DoesNotContain)
-                    .AddAttributesToGet("[System.Id]")
+            => GetBaseToAutomateSuiteQueryBuilder(priorities)
+                    .AddSourceCondition(WiqlConsnt.Conjunction.And, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', testIds) + ")")
+                    .Build();
+
+        private WiqlDirectLinksQueryBuilder GetBaseToAutomateSuiteQueryBuilder(IEnumerable<int> priorities)
+            => new WiqlDirectLinksQueryBuilder(DirectLinkMode.DoesNotContain).AddAttributesToGet("[System.Id]")
+                .AddAttributesToGet("[System.Id]")
                     .AddAttributesToGet(WorkItemFields.GetAdoName("Type"))
                     .AddAttributesToGet(WorkItemFields.GetAdoName("Title"))
                     .AddAttributesToGet(WorkItemFields.GetAdoName("Priority"))
@@ -209,7 +185,6 @@ namespace TestRuns.Tests
 
                     .AddSourceCondition("[Source].[System.TeamProject] = @project")
                     .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Test Case")
-                    .AddSourceCondition(WiqlConsnt.Conjunction.And, "[System.Id]", WiqlConsnt.Operator.In, "(" + string.Join(',', testIds) + ")")
                     .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationStatus"), WiqlConsnt.Operator.NotEqual, "Automated")
                     .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("AutomationPriority"), WiqlConsnt.Operator.NotEqual, 4)
                     .AddSourceCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("State"), WiqlConsnt.Operator.NotEqual, "Closed")
@@ -219,8 +194,7 @@ namespace TestRuns.Tests
 
                     .AddTargetCondition("[Target].[System.TeamProject] = @project")
                     .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Type"), WiqlConsnt.Operator.Equal, "Product Backlog Item")
-                    .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Title"), WiqlConsnt.Operator.Contains, "Auto")
-                    .Build();
+                    .AddTargetCondition(WiqlConsnt.Conjunction.And, WorkItemFields.GetAdoName("Title"), WiqlConsnt.Operator.Contains, "Auto");
 
         private WiqlDirectLinksQueryBuilder GetNightlySuiteQueryBuilder(TestSuiteType suite)
         {
@@ -288,7 +262,16 @@ namespace TestRuns.Tests
         [TestMethod]
         public void GetSuiteFailedTestIds()
         {
-            var suiteId = 278993;
+            var suiteId = NightlySuits[TestSuiteType.UI];
+            var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suiteId);
+
+            Assert.Inconclusive(string.Join(",", testsIds));
+        }
+
+        [TestMethod]
+        public void GetSuitePassedTestIds()
+        {
+            var suiteId = NightlySuits[TestSuiteType.UI];
             var testsIds = apiSteps.GetSuiteNotPassedTestIds(TestPlanId, suiteId);
 
             Assert.Inconclusive(string.Join(",", testsIds));

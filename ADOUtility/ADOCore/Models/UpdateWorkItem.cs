@@ -8,15 +8,15 @@ namespace ADOCore.Models
 {
     public class RootUpdateWorkItem
     {
-        public string Op { get; set; }
-        public string Path { get; set; }
-        public int Value { get; set; }
+        public string op { get; set; }
+        public string path { get; set; }
+        public int value { get; set; }
     }
 
     public class UpdateWorkItem
     {
-        public string Op { get; set; }
-        public string Path { get; set; }
-        public object Value { get; set; }
+        public string op { get; set; }
+        public string path { get; set; }
+        public object value { get; set; }
     }
 }

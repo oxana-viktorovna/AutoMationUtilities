@@ -24,33 +24,33 @@ namespace ADOCore.ApiClients
         {
             var updateRoot = new RootUpdateWorkItem()
             {
-                Op = "test",
-                Path = "/rev",
-                Value = rev
+                op = "test",
+                path = "/rev",
+                value = rev
             };
             var updateTestId = new UpdateWorkItem()
             {
-                Op = "add",
-                Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestId",
-                Value = Guid.NewGuid().ToString()
+                op = "add",
+                path = "/fields/Microsoft.VSTS.TCM.AutomatedTestId",
+                value = "32"//Guid.NewGuid().ToString()
             };
             var updateTestName = new UpdateWorkItem()
             {
-                Op = "add",
-                Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestName",
-                Value = fullTestName
+                op = "add",
+                path = "/fields/Microsoft.VSTS.TCM.AutomatedTestName",
+                value = fullTestName
             };
             var updateStorage = new UpdateWorkItem()
             {
-                Op = "add",
-                Path = "/fields/Microsoft.VSTS.TCM.AutomatedTestStorage",
-                Value = "Tracker.Testing.Automation.Tests.dll"
+                op = "add",
+                path = "/fields/Microsoft.VSTS.TCM.AutomatedTestStorage",
+                value = "Tracker.Testing.Automation.Tests.dll"
             };
             var updateTestStatus = new UpdateWorkItem()
             {
-                Op = "add",
-                Path = "/fields/Microsoft.VSTS.TCM.AutomationStatus",
-                Value = "Automated"
+                op = "add",
+                path = "/fields/Microsoft.VSTS.TCM.AutomationStatus",
+                value = "Automated"
             };
 
             var body = new object[]
@@ -68,18 +68,18 @@ namespace ADOCore.ApiClients
             var body = new List<object>();
             var updateRoot = new RootUpdateWorkItem()
             {
-                Op = "test",
-                Path = "/rev",
-                Value = rev
+                op = "test",
+                path = "/rev",
+                value = rev
             };
             body.Add(updateRoot);
             foreach (var linkId in linkIds)
             {
                 var update = new UpdateWorkItem()
                 {
-                    Op = "add",
-                    Path = "/relations/-",
-                    Value = new
+                    op = "add",
+                    path = "/relations/-",
+                    value = new
                     {
                         rel = "System.LinkTypes.Related",
                         url = $"{baseUrl}/wit/workItems/{linkId}",

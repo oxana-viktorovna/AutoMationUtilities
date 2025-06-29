@@ -31,6 +31,9 @@ public class WorkItemFields
     [JsonPropertyName("Microsoft.VSTS.Scheduling.Effort")]
     public double Effort { get; set; }
 
+    [JsonPropertyName("Microsoft.VSTS.Scheduling.CompletedWork")]
+    public double CompletedWork { get; set; }
+
     [JsonPropertyName("System.Reason")]
     public string Reason { get; set; }
 

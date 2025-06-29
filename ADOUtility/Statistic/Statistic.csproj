@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="AutoStatisticSettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="AutoStatisticSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
